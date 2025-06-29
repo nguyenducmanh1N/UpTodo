@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uptodo/providers/auth_provider.dart';
+import 'package:uptodo/widgets/home_screen.dart';
+import 'widgets/auth/login_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: const TodoApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TodoApp extends StatelessWidget {
+  const TodoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(),
       debugShowCheckedModeBanner: false,
+      home: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          return authProvider.authStatus == AuthStatus.authenticated ? HomeScreen() : LoginScreen();
+        },
+      ),
     );
   }
 }
