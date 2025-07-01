@@ -3,17 +3,21 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class AuthService {
-  Future<bool> login(String username, String password) async {
+  Future<Map<String, dynamic>?> login(String username, String password) async {
     await Future.delayed(const Duration(seconds: 1));
     if (username.trim() == 'user@gmail.com' && password.trim() == 'password') {
-      return true;
-    } else {
-      return false;
+      return {'id': '12345', 'name': 'Nguyen Manh', 'email': username.trim(), 'token': '123aaa'};
     }
+    return null;
   }
 
-  Future<bool> register(String email, String password) async {
+  Future<Map<String, dynamic>> register(String email, String password) async {
     await Future.delayed(const Duration(seconds: 1));
-    return Random().nextBool();
+    return {
+      'id': Random().nextInt(100000).toString(),
+      'name': 'New User',
+      'email': email.trim(),
+      'token': '${Random().nextInt(1000)}'
+    };
   }
 }

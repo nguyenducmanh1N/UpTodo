@@ -2,34 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:uptodo/styles/app_color.dart';
 
 class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
   final String hintText;
-  final VoidCallback onChanged;
+  final ValueChanged<String>? onChanged;
   final bool obscureText;
+  final String? errorText;
 
   const CustomTextField({
     super.key,
-    required this.controller,
     required this.hintText,
     required this.onChanged,
     this.obscureText = false,
+    this.errorText,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      onChanged: (value) => onChanged(),
+      onChanged: onChanged,
       obscureText: obscureText,
-      style: TextStyle(color: AppColor.uptodowhite),
+      style: TextStyle(color: AppColor.upToDoWhile),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: AppColor.uptodoBoder),
+        errorText: errorText,
+        hintStyle: TextStyle(color: AppColor.upToDoWhile),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),
         filled: true,
-        fillColor: Colors.grey[900],
+        fillColor: AppColor.upToDoBorder,
       ),
     );
   }

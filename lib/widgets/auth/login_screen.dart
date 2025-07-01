@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uptodo/providers/auth_provider.dart';
+import 'package:uptodo/repositories/auth_repository.dart';
 import 'package:uptodo/services/auth_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
@@ -6,58 +11,74 @@ import 'package:uptodo/utils/email_validator.dart';
 import 'package:uptodo/utils/password_validator.dart';
 import 'package:uptodo/widgets/auth/components/custom_button.dart';
 import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
+import 'package:uptodo/widgets/auth/components/social_button.dart';
 import 'package:uptodo/widgets/auth/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onLogin;
+  final VoidCallback onLoggedIn;
 
-  const LoginScreen({super.key, required this.onLogin});
+  const LoginScreen({super.key, required this.onLoggedIn});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final AuthService _authService = AuthService();
+  final AuthRepository _authRepository = AuthRepository(AuthService());
   String? _emailError;
   String? _passwordError;
   String _errorMessage = '';
   bool _isButtonEnabled = false;
+  Timer? _debounce;
+  String _username = '';
+  String _password = '';
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
-  void _validateInputs() {
+  void _onUsernameChanged(String value) {
+    _username = value;
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(seconds: 1), () {
+      setState(() {
+        _emailError = Email.dirty(value).error?.errorMessage;
+        _updateButtonState();
+      });
+    });
+  }
+
+  void _onPasswordChanged(String value) {
+    _password = value;
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(seconds: 1), () {
+      setState(() {
+        _passwordError = Password.dirty(value).error?.errorMessage;
+        _updateButtonState();
+      });
+    });
+  }
+
+  void _updateButtonState() {
     setState(() {
-      _emailError = Email.dirty(_usernameController.text).error?.errorMessage;
-      _passwordError = Password.dirty(_passwordController.text).error?.errorMessage;
       _isButtonEnabled = _emailError == null && _passwordError == null;
     });
   }
 
-  Future<void> _handleLogin() async {
-    _validateInputs();
-
+  Future<void> _handleLogin(BuildContext context) async {
     if (!_isButtonEnabled) return;
 
-    bool success = await _authService.login(
-      _usernameController.text.trim(),
-      _passwordController.text.trim(),
-    );
-
-    if (success) {
-      widget.onLogin();
-      return;
+    final loginResponse = await _authRepository.login(_username, _password);
+    if (loginResponse != null) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.login();
+    } else {
+      setState(() {
+        _errorMessage = 'Login failed. Please check your credentials.';
+      });
     }
-    setState(() {
-      _errorMessage = 'Invalid username or password';
-    });
   }
 
   @override
@@ -73,43 +94,45 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Text(
                   "Login",
-                  style: AppTextStyles.uptododisplaylarge.copyWith(
-                    color: AppColor.uptodowhite,
+                  style: AppTextStyles.displayLarge.copyWith(
+                    color: AppColor.upToDoWhile,
                   ),
                 ),
                 const SizedBox(height: 24),
                 Text("Username",
-                    style: AppTextStyles.uptododisplaysmall.copyWith(
-                      color: AppColor.uptodokeycolorsprimary,
+                    style: AppTextStyles.displaySmall.copyWith(
+                      color: AppColor.upToDoKeyPrimary,
                     )),
                 const SizedBox(height: 8),
                 CustomTextField(
-                  controller: _usernameController,
                   hintText: "Enter your Username",
-                  onChanged: _validateInputs,
+                  onChanged: _onUsernameChanged,
+                  errorText: _emailError,
                 ),
                 const SizedBox(height: 16),
                 Text("Password",
-                    style: AppTextStyles.uptododisplaysmall.copyWith(
-                      color: AppColor.uptodokeycolorsprimary,
+                    style: AppTextStyles.displaySmall.copyWith(
+                      color: AppColor.upToDoKeyPrimary,
                     )),
                 const SizedBox(height: 8),
                 CustomTextField(
-                  controller: _passwordController,
                   hintText: "Enter your Password",
-                  onChanged: _validateInputs,
+                  onChanged: _onPasswordChanged,
                   obscureText: true,
+                  errorText: _passwordError,
                 ),
                 if (_errorMessage.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
                     _errorMessage,
-                    style: TextStyle(color: Colors.red, fontSize: 12),
+                    style: AppTextStyles.displaySmall.copyWith(
+                      color: Colors.red,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 24),
                 CustomButton(
-                  onPressed: _isButtonEnabled ? _handleLogin : null,
+                  onPressed: _isButtonEnabled ? () => _handleLogin(context) : null,
                   label: "Login",
                   isEnabled: _isButtonEnabled,
                 ),
@@ -125,79 +148,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColor.uptodoprimary, width: 1.5),
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      backgroundColor: AppColor.uptodoblack,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image(
-                          image: AssetImage('assets/images/gg_icon.png'),
-                          width: 20,
-                          height: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text("Login with Google",
-                            style: AppTextStyles.uptododisplaysmall.copyWith(
-                              color: AppColor.uptodowhite,
-                            )),
-                      ],
-                    ),
-                  ),
-                ),
+                SocialButton(label: "Login with Google", iconPath: 'assets/images/gg_icon.png', onPressed: () {}),
                 const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColor.uptodoprimary, width: 1.5),
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      backgroundColor: AppColor.uptodoblack,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image(
-                          image: AssetImage('assets/images/apple_icon.png'),
-                          width: 20,
-                          height: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text("Login with Apple",
-                            style: AppTextStyles.uptododisplaysmall.copyWith(
-                              color: AppColor.uptodowhite,
-                            )),
-                      ],
-                    ),
-                  ),
-                ),
+                SocialButton(label: "Login with Apple", iconPath: 'assets/images/apple_icon.png', onPressed: () {}),
                 const SizedBox(height: 50),
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text("Don't have an account?",
-                          style: AppTextStyles.uptododisplaysmall.copyWith(
-                            color: AppColor.uptodoBoder,
+                          style: AppTextStyles.displaySmall.copyWith(
+                            color: AppColor.upToDoBorder,
                           )),
                       TextButton(
                         onPressed: () {
@@ -205,8 +166,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Text(
                           "Register",
-                          style: AppTextStyles.uptododisplaysmall.copyWith(
-                            color: AppColor.uptodowhite,
+                          style: AppTextStyles.displaySmall.copyWith(
+                            color: AppColor.upToDoWhile,
                           ),
                         ),
                       ),

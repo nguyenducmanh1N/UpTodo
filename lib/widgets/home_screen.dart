@@ -3,7 +3,8 @@ import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/widgets/shared/components/CustomBottomnavigationBar.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required void Function() onLogout});
+  final VoidCallback onLoggedOut;
+  const HomeScreen({super.key, required this.onLoggedOut});
 
   @override
   State<HomeScreen> createState() => _MyWidgetState();
@@ -54,7 +55,7 @@ class _MyWidgetState extends State<HomeScreen> {
                           Image(image: AssetImage('assets/images/Checklist-rafiki_1.png')),
                           Text(
                             'What do you want to do today?',
-                            style: AppTextStyles.uptododisplaysmall.copyWith(
+                            style: AppTextStyles.displaySmall.copyWith(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -63,7 +64,7 @@ class _MyWidgetState extends State<HomeScreen> {
                           SizedBox(height: 8),
                           Text(
                             "Tap + to add your tasks",
-                            style: AppTextStyles.uptododisplaysmall.copyWith(
+                            style: AppTextStyles.displaySmall.copyWith(
                               color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
@@ -77,10 +78,10 @@ class _MyWidgetState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Custombottomnavigationbar(
+      bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: _onNavTapped,
-        onAddPressed: _onAddPressed,
+        onTabSelected: _onNavTapped,
+        onAddButtonPressed: _onAddPressed,
       ),
     );
   }

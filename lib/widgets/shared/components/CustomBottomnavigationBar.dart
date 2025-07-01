@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:uptodo/styles/app_color.dart';
 
-class Custombottomnavigationbar extends StatefulWidget {
+class CustomBottomNavigationBar extends StatefulWidget {
   final int currentIndex;
-  final Function(int) onTap;
-  final VoidCallback onAddPressed;
+  final Function(int) onTabSelected;
+  final VoidCallback onAddButtonPressed;
 
-  const Custombottomnavigationbar({
+  const CustomBottomNavigationBar({
     super.key,
     required this.currentIndex,
-    required this.onTap,
-    required this.onAddPressed,
+    required this.onTabSelected,
+    required this.onAddButtonPressed,
   });
 
   @override
-  State<Custombottomnavigationbar> createState() => _CustomBottomNavigationBarState();
+  State<CustomBottomNavigationBar> createState() => _CustomBottomNavigationBarState();
 }
 
-class _CustomBottomNavigationBarState extends State<Custombottomnavigationbar> {
+class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -28,31 +28,31 @@ class _CustomBottomNavigationBarState extends State<Custombottomnavigationbar> {
           Container(
             height: 90,
             decoration: BoxDecoration(
-              color: AppColor.uptodoBoder,
+              color: AppColor.upToDoBorder,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildBtItem(
+                _buildButtonItem(
                   image: Image.asset('assets/images/index.png'),
                   label: 'Index',
                   index: 0,
                   isSelected: widget.currentIndex == 0,
                 ),
-                _buildBtItem(
+                _buildButtonItem(
                   image: Image.asset('assets/images/calendar.png'),
                   label: 'Calendar',
                   index: 1,
                   isSelected: widget.currentIndex == 1,
                 ),
                 SizedBox(width: 64),
-                _buildBtItem(
+                _buildButtonItem(
                   image: Image.asset('assets/images/focus.png'),
                   label: 'Focus',
                   index: 2,
                   isSelected: widget.currentIndex == 2,
                 ),
-                _buildBtItem(
+                _buildButtonItem(
                   image: Image.asset('assets/images/profile.png'),
                   label: 'Profile',
                   index: 3,
@@ -65,16 +65,16 @@ class _CustomBottomNavigationBarState extends State<Custombottomnavigationbar> {
             top: -32,
             left: MediaQuery.of(context).size.width / 2 - 32,
             child: GestureDetector(
-              onTap: widget.onAddPressed,
+              onTap: widget.onAddButtonPressed,
               child: Container(
                 width: 70,
                 height: 70,
                 decoration: BoxDecoration(
-                  color: Color(0xFF8875FF),
+                  color: AppColor.upToDoPrimary,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xFF8875FF).withOpacity(0.3),
+                      color: AppColor.upToDoPrimary,
                       blurRadius: 10,
                       offset: Offset(0, 4),
                     ),
@@ -93,14 +93,14 @@ class _CustomBottomNavigationBarState extends State<Custombottomnavigationbar> {
     );
   }
 
-  Widget _buildBtItem({
+  Widget _buildButtonItem({
     required Image image,
     required String label,
     required int index,
     required bool isSelected,
   }) {
     return GestureDetector(
-      onTap: () => widget.onTap(index),
+      onTap: () => widget.onTabSelected(index),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 8),
         child: Column(
@@ -117,7 +117,7 @@ class _CustomBottomNavigationBarState extends State<Custombottomnavigationbar> {
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Color(0xFF8875FF) : Colors.white,
+                color: isSelected ? AppColor.upToDoPrimary : Colors.white,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),

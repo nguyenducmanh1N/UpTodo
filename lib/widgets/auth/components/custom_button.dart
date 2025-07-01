@@ -25,15 +25,17 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isEnabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isEnabled ? AppColor.uptodoprimary : AppColor.uptodoprimary_50,
+          backgroundColor: isEnabled ? AppColor.upToDoPrimary : AppColor.upToDoPrimary50,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
+          disabledBackgroundColor: AppColor.upToDoPrimary50,
+          disabledForegroundColor: AppColor.upToDoWhile,
         ),
         child: Text(
           label,
-          style: AppTextStyles.uptododisplaysmall.copyWith(
-            color: AppColor.uptodowhite,
+          style: AppTextStyles.displaySmall.copyWith(
+            color: AppColor.upToDoWhile,
           ),
         ),
       ),

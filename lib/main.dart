@@ -1,41 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uptodo/providers/auth_provider.dart';
 import 'package:uptodo/widgets/home_screen.dart';
-
 import 'widgets/auth/login_screen.dart';
 
-enum AuthStatus { authorized, unAuthorized }
-
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: const TodoApp(),
+    ),
+  );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  AuthStatus _authStatus = AuthStatus.unAuthorized;
-
-  void _login() {
-    setState(() {
-      _authStatus = AuthStatus.authorized;
-    });
-  }
-
-  void _logout() {
-    setState(() {
-      _authStatus = AuthStatus.unAuthorized;
-    });
-  }
+class TodoApp extends StatelessWidget {
+  const TodoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: _authStatus == AuthStatus.authorized ? HomeScreen(onLogout: _logout) : LoginScreen(onLogin: _login),
+      home: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          return authProvider.authStatus == AuthStatus.authenticated
+              ? HomeScreen(onLoggedOut: authProvider.logout)
+              : LoginScreen(onLoggedIn: authProvider.login);
+        },
+      ),
     );
   }
 }
