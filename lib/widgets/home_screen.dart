@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uptodo/providers/auth_provider.dart';
+import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
-import 'package:uptodo/widgets/shared/components/CustomBottomnavigationBar.dart';
+import 'package:uptodo/widgets/addTask/add_task_bottom_sheet.dart';
+import 'package:uptodo/widgets/shared/components/custom_bottom_navigation_bar.dart';
+import 'package:uptodo/widgets/shared/components/header.dart';
 
 class HomeScreen extends StatefulWidget {
-  final VoidCallback onLoggedOut;
-  const HomeScreen({super.key, required this.onLoggedOut});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _MyWidgetState();
@@ -29,52 +33,73 @@ class _MyWidgetState extends State<HomeScreen> {
   }
 
   void _onAddPressed() {
-    // showModalBottomSheet(
-    //   context: context,
-    //   isScrollControlled: true,
-    //   backgroundColor: Colors.transparent,
-    //   builder: (context) => const AddTaskBottomSheet(),
-    // );
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AddTaskBottomSheet(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _items.isEmpty
-                  ? Container(
-                      padding: EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image(image: AssetImage('assets/images/Checklist-rafiki_1.png')),
-                          Text(
-                            'What do you want to do today?',
-                            style: AppTextStyles.displaySmall.copyWith(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Header(),
+                SizedBox(height: 16),
+                _items.isEmpty
+                    ? Container(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.logout, color: Colors.white),
+                              onPressed: () {
+                                Provider.of<AuthProvider>(context, listen: false).logout();
+                              },
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Tap + to add your tasks",
-                            style: AppTextStyles.displaySmall.copyWith(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
+                            Image(image: AssetImage('assets/images/Checklist-rafiki_1.png')),
+                            Text(
+                              'What do you want to do today?',
+                              style: AppTextStyles.displaySmall.copyWith(
+                                color: AppColor.upToDoWhile,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          )
-                        ],
+                            SizedBox(height: 8),
+                            Text(
+                              "Tap + to add your tasks",
+                              style: AppTextStyles.displaySmall.copyWith(
+                                color: AppColor.upToDoWhile,
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    : Container(
+                        child: Column(
+                          children: [
+                            SearchBar(
+                              hintText: "Search tasks",
+                              onChanged: (value) {},
+                            ),
+                            SizedBox(height: 16),
+                          ],
+                        ),
                       ),
-                    )
-                  : Container(),
-            ],
+              ],
+            ),
           ),
         ),
       ),

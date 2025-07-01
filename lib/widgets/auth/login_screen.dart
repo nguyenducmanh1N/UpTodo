@@ -15,9 +15,7 @@ import 'package:uptodo/widgets/auth/components/social_button.dart';
 import 'package:uptodo/widgets/auth/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onLoggedIn;
-
-  const LoginScreen({super.key, required this.onLoggedIn});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -41,23 +39,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _onUsernameChanged(String value) {
     _username = value;
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(seconds: 1), () {
-      setState(() {
-        _emailError = Email.dirty(value).error?.errorMessage;
-        _updateButtonState();
-      });
+
+    setState(() {
+      _emailError = Email.dirty(value).error?.errorMessage;
+      _updateButtonState();
     });
   }
 
   void _onPasswordChanged(String value) {
     _password = value;
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(seconds: 1), () {
-      setState(() {
-        _passwordError = Password.dirty(value).error?.errorMessage;
-        _updateButtonState();
-      });
+
+    setState(() {
+      _passwordError = Password.dirty(value).error?.errorMessage;
+      _updateButtonState();
     });
   }
 
@@ -69,11 +63,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin(BuildContext context) async {
     if (!_isButtonEnabled) return;
-
+    print('Username: $_username, Password: $_password');
     final loginResponse = await _authRepository.login(_username, _password);
     if (loginResponse != null) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       authProvider.login();
+      print('Login successful: $loginResponse');
     } else {
       setState(() {
         _errorMessage = 'Login failed. Please check your credentials.';

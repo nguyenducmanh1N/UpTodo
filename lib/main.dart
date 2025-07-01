@@ -22,9 +22,7 @@ class TodoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
-          return authProvider.authStatus == AuthStatus.authenticated
-              ? HomeScreen(onLoggedOut: authProvider.logout)
-              : LoginScreen(onLoggedIn: authProvider.login);
+          return authProvider.authStatus == AuthStatus.authenticated ? HomeScreen() : LoginScreen();
         },
       ),
     );

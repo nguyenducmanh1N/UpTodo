@@ -39,38 +39,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _onEmailChanged(String value) {
     _email = value;
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(seconds: 1), () {
-      setState(() {
-        _emailError = Email.dirty(value).error?.errorMessage;
-        _updateButtonState();
-      });
+    setState(() {
+      _emailError = Email.dirty(value).error?.errorMessage;
+      _updateButtonState();
     });
   }
 
   void _onPasswordChanged(String value) {
     _password = value;
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(seconds: 1), () {
-      setState(() {
-        _passwordError = Password.dirty(value).error?.errorMessage;
-        _updateButtonState();
-      });
+    setState(() {
+      _passwordError = Password.dirty(value).error?.errorMessage;
+      _updateButtonState();
     });
   }
 
   void _onConfirmPasswordChanged(String value) {
     _confirmPassword = value;
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(seconds: 1), () {
-      setState(() {
-        if (value != _password) {
-          _confirmPasswordError = 'Passwords do not match';
-        } else {
-          _confirmPasswordError = null;
-        }
-        _updateButtonState();
-      });
+    setState(() {
+      if (value != _password) {
+        _confirmPasswordError = 'Passwords do not match';
+      } else {
+        _confirmPasswordError = null;
+      }
+      _updateButtonState();
     });
   }
 
@@ -83,11 +74,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _handleRegister() async {
     if (!_isButtonEnabled) return;
     var registerResponse = await _authRepository.register(_email, _password);
-    if (registerResponse.isEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen(onLoggedIn: () {})),
-      );
+    if (registerResponse.isNotEmpty) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
       return;
     }
     setState(() {
@@ -188,12 +176,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           )),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginScreen(
-                                        onLoggedIn: () {},
-                                      )));
+                          Navigator.of(context).popUntil((route) => route.isFirst);
                         },
                         child: Text(
                           "Login",
