@@ -1,3 +1,4 @@
+import 'package:uptodo/models/user/user_dto.dart';
 import 'package:uptodo/services/auth_service.dart';
 
 class AuthRepository {
@@ -5,7 +6,7 @@ class AuthRepository {
 
   AuthRepository(this._authService);
 
-  Future<Map<String, dynamic>?> login(String username, String password) async {
+  Future<UserDTO?> login(String username, String password) async {
     final response = await _authService.login(username, password);
     return response;
   }

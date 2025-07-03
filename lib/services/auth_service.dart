@@ -1,12 +1,18 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:uptodo/models/user/user_dto.dart';
 
 class AuthService {
-  Future<Map<String, dynamic>?> login(String username, String password) async {
+  Future<UserDTO?> login(String username, String password) async {
     await Future.delayed(const Duration(seconds: 1));
     if (username.trim() == 'user@gmail.com' && password.trim() == 'password') {
-      return {'id': '12345', 'name': 'Nguyen Manh', 'email': username.trim(), 'token': '123aaa'};
+      return UserDTO(
+        id: '12345',
+        email: username.trim(),
+        password: password,
+        token: '123aaa',
+      );
     }
     return null;
   }

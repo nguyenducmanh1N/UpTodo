@@ -7,8 +7,8 @@ import 'package:uptodo/repositories/auth_repository.dart';
 import 'package:uptodo/services/auth_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
-import 'package:uptodo/utils/email_validator.dart';
-import 'package:uptodo/utils/password_validator.dart';
+import 'package:uptodo/utils/validator/email_validator.dart';
+import 'package:uptodo/utils/validator/password_validator.dart';
 import 'package:uptodo/widgets/auth/components/custom_button.dart';
 import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
 import 'package:uptodo/widgets/auth/components/social_button.dart';
@@ -39,7 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _onUsernameChanged(String value) {
     _username = value;
-
     setState(() {
       _emailError = Email.dirty(value).error?.errorMessage;
       _updateButtonState();
@@ -48,7 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _onPasswordChanged(String value) {
     _password = value;
-
     setState(() {
       _passwordError = Password.dirty(value).error?.errorMessage;
       _updateButtonState();
@@ -63,11 +61,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin(BuildContext context) async {
     if (!_isButtonEnabled) return;
-    print('Username: $_username, Password: $_password');
     final loginResponse = await _authRepository.login(_username, _password);
     if (loginResponse != null) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.login();
+      authProvider.login(loginResponse);
       print('Login successful: $loginResponse');
     } else {
       setState(() {
