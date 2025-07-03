@@ -33,9 +33,12 @@ dependencies:
   formz: ^0.7.0
   table_calendar: ^3.0.8
   provider: ^6.1.5
+<<<<<<< HEAD
   freezed_annotation: ^2.4.1
   json_annotation: ^4.8.1
   shared_preferences: ^2.3.2
+=======
+>>>>>>> e74c00cd1e83197ea7fc3a11d3841a36b4114a17
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

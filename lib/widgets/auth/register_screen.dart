@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:uptodo/repositories/auth_repository.dart';
@@ -11,7 +10,6 @@ import 'package:uptodo/utils/validator/password_validator.dart';
 import 'package:uptodo/widgets/auth/components/custom_button.dart';
 import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
 import 'package:uptodo/widgets/auth/components/social_button.dart';
-import 'package:uptodo/widgets/auth/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
