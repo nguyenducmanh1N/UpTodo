@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:uptodo/models/category/category_dto.dart';
 import 'package:uptodo/models/user/user_dto.dart';
 
 enum AuthStatus {

@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../category/category_dto.dart';
 
 part 'task_dto.freezed.dart';
 part 'task_dto.g.dart';
@@ -14,6 +13,7 @@ class TaskDTO with _$TaskDTO {
     required String time,
     required String categoryId,
     required String priority,
+    bool? isCompleted,
     @Default([]) List<TaskDTO> subtask,
   }) = _TaskDTO;
 

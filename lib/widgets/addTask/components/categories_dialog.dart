@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uptodo/models/category/category_dto.dart';
@@ -23,10 +20,7 @@ class CategoriesDialog extends StatefulWidget {
 
 class _CategoriesDialogState extends State<CategoriesDialog> {
   final CategoryRepository _categoryRepository = CategoryRepository(CategoryService());
-  final ImagesStorageRepository _imagesStorageRepository = ImagesStorageRepository(ImagesStorageService());
-
   late final AuthProvider authProvider;
-
   List<CategoryDTO> _categories = [];
   bool _isLoading = true;
 
@@ -42,8 +36,7 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
       int index = int.parse(colorIndex);
       return ColorUtils.getColorFromIndex(index);
     } catch (e) {
-      print('Error parsing color index: $e');
-      return Colors.grey;
+      return AppColor.upToDoPrimary;
     }
   }
 
@@ -55,9 +48,6 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
     try {
       final userId = authProvider.currentUser?.id ?? '';
       final categories = await _categoryRepository.getCategories(userId);
-      for (var category in categories) {
-        print('Category: ${category.name}, Color: ${category.color}, Image: ${category.img}');
-      }
       setState(() {
         _categories = categories;
         _isLoading = false;
@@ -125,10 +115,12 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
                               onTap: () {
                                 _onCategorySelected(category.id);
                               },
-                              child: FutureBuilder<String?>(
-                                future: _imagesStorageRepository.getImagePath(category.img),
-                                builder: (context, snapshot) => _buildCategoryImage(snapshot),
-                              ),
+                              child: Image(
+                                  image: NetworkImage(
+                                category.img.isNotEmpty
+                                    ? category.img
+                                    : 'https://nftcalendar.io/storage/uploads/2022/02/21/image-not-found_0221202211372462137974b6c1a.png',
+                              )),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -177,7 +169,7 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   }
 
   void _onCategorySelected(String id) {
-    print('Selected category: $id');
+    Navigator.pop(context, id);
   }
 
   void _onAddCategoryPressed(BuildContext context) {
@@ -186,34 +178,4 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
       MaterialPageRoute(builder: (context) => AddCategoryScreen()),
     );
   }
-}
-
-Widget _buildCategoryImage(AsyncSnapshot<String?> snapshot) {
-  if (snapshot.connectionState == ConnectionState.waiting) {
-    return const Center(
-      child: SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  if (snapshot.hasData && snapshot.data != null) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.file(
-        File(snapshot.data!),
-        fit: BoxFit.cover,
-      ),
-    );
-  }
-
-  return const Icon(
-    Icons.image_not_supported,
-    color: AppColor.upToDoWhile,
-  );
 }

@@ -12,7 +12,8 @@ import 'package:uptodo/services/images_storage_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/color_utils.dart';
-import 'package:uptodo/widgets/addCategory/componets/category_color_widget.dart';
+import 'package:uptodo/widgets/addCategory/components/category_color_widget.dart';
+import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
 
 class AddCategoryScreen extends StatefulWidget {
   const AddCategoryScreen({super.key});
@@ -30,6 +31,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   int _selectedColorIndex = 0;
   Color? _selectedColor;
   String _categoryName = '';
+  String? _categoryNameError;
   String? _iconPath;
 
   @override
@@ -39,17 +41,28 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     _selectedColor = ColorUtils.categoryColors[0];
   }
 
+  void _onCategoryNameChanged(String value) {
+    setState(() {
+      if (value.trim().isEmpty) {
+        _categoryNameError = 'Category name cannot be empty';
+        return;
+      }
+      _categoryNameError = null;
+      _categoryName = value;
+    });
+  }
+
   void _handleSaveCategory() async {
-    if (_categoryName.isEmpty || _selectedColor == null || _iconPath == null) {
+    if (_selectedColor == null || _iconPath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter all fields')),
       );
       return;
     }
     try {
-      final imageFile = XFile(_iconPath!);
-      final imageId = await _imagesStorageRepository.saveImage(imageFile);
-      if (imageId == null) {
+      final imageFile = File(_iconPath!);
+      final imageUrl = await _imagesStorageRepository.saveImage(imageFile);
+      if (imageUrl == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to save image')),
         );
@@ -60,7 +73,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _categoryName,
         color: _selectedColorIndex.toString(),
-        img: imageId,
+        img: imageUrl,
       );
 
       final userId = authProvider.currentUser?.id ?? '';
@@ -117,16 +130,11 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                   ),
                 ),
                 SizedBox(height: 8),
-                TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      _categoryName = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Category Name',
-                    border: OutlineInputBorder(),
-                  ),
+                CustomTextField(
+                  onChanged: _onCategoryNameChanged,
+                  hintText: "Enter category name",
+                  obscureText: false,
+                  errorText: _categoryNameError,
                 ),
                 SizedBox(height: 16),
                 Text(

@@ -1,35 +1,54 @@
+import 'dart:convert';
 import 'dart:io';
-import 'package:path/path.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:image_picker/image_picker.dart' show ImagePicker, ImageSource, XFile;
-import 'package:uptodo/constants/shared_preferences.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
 class ImagesStorageService {
-  final String imageKey = SharedPreferencesKeys.imagesKey;
+  static const String cloudName = 'dmxqkiwbe';
+  static const String uploadPreset = 'flutter_unsigned_preset';
 
-  Future<String?> saveImage(XFile image) async {
-    try {
-      final String duplicateFilePath = (await getApplicationDocumentsDirectory()).path;
-      final String fileName = basename(image.path);
-      final String savedPath = '$duplicateFilePath/$fileName';
-      await image.saveTo(savedPath);
-      final String imageId = '${imageKey}_${DateTime.now().millisecondsSinceEpoch}';
-      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      await sharedPreferences.setString(imageId, savedPath);
-      return imageId;
-    } catch (e) {
-      print('Error saving image: $e');
+  Future<String?> uploadImage(File imageFile) async {
+    final uri = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/upload');
+    final request = http.MultipartRequest('POST', uri)
+      ..fields['upload_preset'] = uploadPreset
+      ..files.add(await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+        filename: path.basename(imageFile.path),
+      ));
+    final response = await request.send();
+    if (response.statusCode == 200) {
+      final responseData = await http.Response.fromStream(response);
+      final data = json.decode(responseData.body);
+      return data['secure_url'];
+    } else {
+      print('Upload failed: ${response.statusCode}');
       return null;
     }
   }
 
-  Future<String?> getImagePath(String imageId) async {
+  Future<String?> deleteImage(String publicId) async {
     try {
-      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      return sharedPreferences.getString(imageId);
+      final url = Uri.parse('https://api.cloudinary.com/v1_1/dmxqkiwbe/image/destroy');
+      final response = await http.post(
+        url,
+        body: {
+          'public_id': publicId,
+          'api_key': '618879161137733',
+          'signature': '7qFSrAfKqITwaKHBxg5PvKW2QCQ',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonMap = jsonDecode(response.body);
+        return jsonMap['result'] as String?;
+      } else {
+        print('Cloudinary delete failed: ${response.statusCode}');
+        return null;
+      }
     } catch (e) {
-      print('Error getting image path: $e');
+      print('Error deleting image from Cloudinary: $e');
       return null;
     }
   }

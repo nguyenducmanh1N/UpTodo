@@ -1,6 +1,4 @@
 import 'dart:math';
-
-import 'package:flutter/material.dart';
 import 'package:uptodo/models/user/user_dto.dart';
 
 class AuthService {
@@ -10,8 +8,9 @@ class AuthService {
       return UserDTO(
         id: '12345',
         email: username.trim(),
-        password: password,
         token: '123aaa',
+        username: 'User',
+        imageUrl: 'personal_image.png',
       );
     }
     return null;
