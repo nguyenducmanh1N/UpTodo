@@ -10,9 +10,9 @@ class TimeDialog extends StatefulWidget {
 }
 
 class _TimeDialogState extends State<TimeDialog> {
-  int _selectedHour = 8;
-  int _selectedMinute = 20;
-  String _selectedPeriod = "AM";
+  final int _selectedHour = DateTime.now().hour;
+  final int _selectedMinute = DateTime.now().minute;
+  final String _selectedPeriod = DateTime.now().hour >= 12 ? "PM" : "AM";
 
   @override
   Widget build(BuildContext context) {
@@ -37,39 +37,13 @@ class _TimeDialogState extends State<TimeDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Hour Picker
-                _buildPicker(
-                  currentValue: _selectedHour,
-                  values: List.generate(12, (index) => index + 1),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedHour = value;
-                    });
-                  },
-                ),
-                const Text(
+                Text(
                   ":",
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
-                _buildPicker(
-                  currentValue: _selectedMinute,
-                  values: List.generate(60, (index) => index),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedMinute = value;
-                    });
-                  },
+                  style: AppTextStyles.displayMedium.copyWith(
+                    color: AppColor.upToDoWhile,
+                  ),
                 ),
                 const SizedBox(width: 16),
-                _buildPicker(
-                  currentValue: _selectedPeriod == "AM" ? 0 : 1,
-                  values: ["AM", "PM"],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedPeriod = value == 0 ? "AM" : "PM";
-                    });
-                  },
-                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -108,35 +82,6 @@ class _TimeDialogState extends State<TimeDialog> {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPicker({
-    required dynamic currentValue,
-    required List<dynamic> values,
-    required Function(dynamic) onChanged,
-  }) {
-    return SizedBox(
-      height: 100,
-      width: 60,
-      child: ListWheelScrollView.useDelegate(
-        itemExtent: 40,
-        physics: const FixedExtentScrollPhysics(),
-        onSelectedItemChanged: onChanged,
-        childDelegate: ListWheelChildBuilderDelegate(
-          builder: (context, index) {
-            return Center(
-              child: Text(
-                values[index].toString(),
-                style: AppTextStyles.displaySmall.copyWith(
-                  color: AppColor.upToDoWhile,
-                ),
-              ),
-            );
-          },
-          childCount: values.length,
         ),
       ),
     );

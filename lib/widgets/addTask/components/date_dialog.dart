@@ -14,7 +14,7 @@ class DateDialog extends StatefulWidget {
 }
 
 class _TimerDialogState extends State<DateDialog> {
-  DateTime _focusedDay = DateTime.now();
+  DateTime _defaultDay = DateTime.now();
   DateTime? _selectedDay;
 
   void _showTimeDialog(BuildContext context) {
@@ -34,48 +34,16 @@ class _TimerDialogState extends State<DateDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () {
-                    setState(() {
-                      _focusedDay = DateTime(
-                        _focusedDay.year,
-                        _focusedDay.month - 1,
-                        _focusedDay.day,
-                      );
-                    });
-                  },
+            Center(
+              child: Text(
+                "Choose Task Date",
+                style: AppTextStyles.displayMedium.copyWith(
+                  color: AppColor.upToDoWhile,
                 ),
-                Column(
-                  children: [
-                    Text(
-                      "${_focusedDay.month} ${_focusedDay.year}",
-                      style: AppTextStyles.displayLarge.copyWith(
-                        color: AppColor.upToDoWhile,
-                      ),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward, color: Colors.white),
-                  onPressed: () {
-                    setState(() {
-                      _focusedDay = DateTime(
-                        _focusedDay.year,
-                        _focusedDay.month + 1,
-                        _focusedDay.day,
-                      );
-                    });
-                  },
-                ),
-              ],
+              ),
             ),
-            const SizedBox(height: 16),
             TableCalendar(
-              focusedDay: _focusedDay,
+              focusedDay: _defaultDay,
               firstDay: DateTime(2000),
               lastDay: DateTime(2100),
               selectedDayPredicate: (day) {
@@ -84,25 +52,9 @@ class _TimerDialogState extends State<DateDialog> {
               onDaySelected: (selectedDay, focusedDay) {
                 setState(() {
                   _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
+                  _defaultDay = focusedDay;
                 });
               },
-              calendarStyle: CalendarStyle(
-                selectedDecoration: BoxDecoration(
-                  color: AppColor.upToDoKeyPrimary,
-                  shape: BoxShape.circle,
-                ),
-                todayDecoration: BoxDecoration(
-                  color: AppColor.upToDoBorder,
-                  shape: BoxShape.circle,
-                ),
-                defaultTextStyle: AppTextStyles.displaySmall.copyWith(
-                  color: AppColor.upToDoWhile,
-                ),
-                weekendTextStyle: AppTextStyles.displaySmall.copyWith(
-                  color: Colors.red,
-                ),
-              ),
               headerStyle: HeaderStyle(
                 formatButtonVisible: false,
                 titleCentered: true,

@@ -3,6 +3,7 @@ import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/widgets/addTask/components/categories_dialog.dart';
 import 'package:uptodo/widgets/addTask/components/date_dialog.dart';
+import 'package:uptodo/widgets/addTask/components/priorities_dialog.dart';
 
 class AddTaskBottomSheet extends StatelessWidget {
   const AddTaskBottomSheet({super.key});
@@ -104,7 +105,7 @@ class AddTaskBottomSheet extends StatelessWidget {
                     ),
                     const SizedBox(width: 16),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => _showPrioritiesDialog(context),
                       child: SizedBox(
                         child: Image(image: AssetImage('assets/images/flag_icon.png'), width: 24, height: 24),
                       ),
@@ -123,6 +124,20 @@ class AddTaskBottomSheet extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showDateDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const DateDialog(),
+    );
+  }
+
+  void _showPrioritiesDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => PrioritiesDialog(),
     );
   }
 
