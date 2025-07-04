@@ -9,7 +9,7 @@ import 'package:uptodo/services/images_storage_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/color_utils.dart';
-import 'package:uptodo/widgets/addCategory/add_category_screen.dart';
+import 'package:uptodo/widgets/add_category/add_category_screen.dart';
 
 class CategoriesDialog extends StatefulWidget {
   const CategoriesDialog({super.key});
@@ -31,10 +31,9 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
     _loadCategories();
   }
 
-  Color _getColorFromCategory(String colorIndex) {
+  Color _getColorFromCategory(String colorKey) {
     try {
-      int index = int.parse(colorIndex);
-      return ColorUtils.getColorFromIndex(index);
+      return ColorUtils.getColorFromKey(colorKey);
     } catch (e) {
       return AppColor.upToDoPrimary;
     }
@@ -116,11 +115,14 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
                                 _onCategorySelected(category.id);
                               },
                               child: Image(
-                                  image: NetworkImage(
-                                category.img.isNotEmpty
-                                    ? category.img
-                                    : 'https://nftcalendar.io/storage/uploads/2022/02/21/image-not-found_0221202211372462137974b6c1a.png',
-                              )),
+                                image: category.img.isNotEmpty
+                                    ? NetworkImage(
+                                        category.img,
+                                      )
+                                    : AssetImage(
+                                        'assets/images/image_not_found.png',
+                                      ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -140,8 +142,8 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context);
                 _onAddCategoryPressed(context);
+                _loadCategories();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColor.upToDoPrimary,

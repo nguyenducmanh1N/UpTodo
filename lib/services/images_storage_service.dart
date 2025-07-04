@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
 class ImagesStorageService {
-  static const String cloudName = 'dmxqkiwbe';
-  static const String uploadPreset = 'flutter_unsigned_preset';
-
   Future<String?> uploadImage(File imageFile) async {
+    final String cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? '';
+    final String uploadPreset = dotenv.env['CLOUDINARY_UPLOAD_PRESET'] ?? '';
     final uri = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/upload');
     final request = http.MultipartRequest('POST', uri)
       ..fields['upload_preset'] = uploadPreset
@@ -29,17 +28,19 @@ class ImagesStorageService {
   }
 
   Future<String?> deleteImage(String publicId) async {
+    final String apiKey = dotenv.env['CLOUDINARY_API_KEY'] ?? '';
+    final String cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? '';
+    final String signature = dotenv.env['CLOUDINARY_SIGNATURE'] ?? '';
     try {
-      final url = Uri.parse('https://api.cloudinary.com/v1_1/dmxqkiwbe/image/destroy');
+      final url = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/destroy');
       final response = await http.post(
         url,
         body: {
           'public_id': publicId,
-          'api_key': '618879161137733',
-          'signature': '7qFSrAfKqITwaKHBxg5PvKW2QCQ',
+          'api_key': apiKey,
+          'signature': signature,
         },
       );
-
       if (response.statusCode == 200) {
         final jsonMap = jsonDecode(response.body);
         return jsonMap['result'] as String?;

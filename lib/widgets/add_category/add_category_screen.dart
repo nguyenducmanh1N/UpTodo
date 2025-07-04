@@ -12,8 +12,9 @@ import 'package:uptodo/services/images_storage_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/color_utils.dart';
-import 'package:uptodo/widgets/addCategory/components/category_color_widget.dart';
+import 'package:uptodo/widgets/add_category/components/category_color_widget.dart';
 import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
+import 'package:uuid/uuid.dart';
 
 class AddCategoryScreen extends StatefulWidget {
   const AddCategoryScreen({super.key});
@@ -26,10 +27,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   final CategoryRepository _categoryRepository = CategoryRepository(CategoryService());
   final ImagePicker _imagePicker = ImagePicker();
   final ImagesStorageRepository _imagesStorageRepository = ImagesStorageRepository(ImagesStorageService());
-
   late final AuthProvider authProvider;
-  int _selectedColorIndex = 0;
-  Color? _selectedColor;
+  Color? _selectedColor = ColorUtils.categoryColors[0]['color'];
   String _categoryName = '';
   String? _categoryNameError;
   String? _iconPath;
@@ -38,7 +37,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   void initState() {
     super.initState();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
-    _selectedColor = ColorUtils.categoryColors[0];
   }
 
   void _onCategoryNameChanged(String value) {
@@ -52,6 +50,19 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     });
   }
 
+  Future<String?> _uploadCategoryImage(String iconPath) async {
+    try {
+      final imageFile = File(iconPath);
+      final imageUrl = await _imagesStorageRepository.saveImage(imageFile);
+      return imageUrl;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save image: $e')),
+      );
+      return null;
+    }
+  }
+
   void _handleSaveCategory() async {
     if (_selectedColor == null || _iconPath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,19 +71,18 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
       return;
     }
     try {
-      final imageFile = File(_iconPath!);
-      final imageUrl = await _imagesStorageRepository.saveImage(imageFile);
+      final imageUrl = await _uploadCategoryImage(_iconPath!);
       if (imageUrl == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to save image')),
+          const SnackBar(content: Text('Failed to upload category image')),
         );
         return;
       }
-
+      final uuid = Uuid();
       final category = CategoryDTO(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: uuid.v4(),
         name: _categoryName,
-        color: _selectedColorIndex.toString(),
+        color: ColorUtils.getKeyFromColor(_selectedColor!),
         img: imageUrl,
       );
 
@@ -82,6 +92,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Category saved successfully')),
       );
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saving category: $e')),
@@ -177,12 +188,11 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                   ),
                 SizedBox(height: 16),
                 CategoryColorPicker(
-                  colors: ColorUtils.categoryColors,
+                  colors: ColorUtils.categoryColors.map((e) => e['color'] as Color).toList(),
                   selectedColor: _selectedColor,
                   onColorSelected: (color) {
                     setState(() {
                       _selectedColor = color;
-                      _selectedColorIndex = ColorUtils.getIndexFromColor(color);
                     });
                   },
                 ),

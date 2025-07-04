@@ -12,4 +12,8 @@ class CategoryRepository {
   Future<void> saveCategory(String userId, CategoryDTO category) async {
     await _categoryService.saveCategory(userId, category);
   }
+
+  Future<CategoryDTO?> getCategoryById(String userId, String categoryId) async {
+    return await _categoryService.getCategoryById(userId, categoryId);
+  }
 }

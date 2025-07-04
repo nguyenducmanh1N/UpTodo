@@ -1,10 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uptodo/models/task/task_dto.dart';
 import 'package:uptodo/providers/auth_provider.dart';
+import 'package:uptodo/repositories/category_repository.dart';
+import 'package:uptodo/repositories/task_repository.dart';
+import 'package:uptodo/services/category_service.dart';
+import 'package:uptodo/services/task_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
-
+import 'package:uptodo/widgets/add_task/add_task_bottom_sheet.dart';
 import 'package:uptodo/widgets/shared/components/custom_bottom_navigation_bar.dart';
+import 'package:uptodo/widgets/shared/components/header.dart';
+import 'package:uptodo/widgets/shared/components/task_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,8 +22,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<HomeScreen> {
-  final List<String> _items = [];
-
+  final List<TaskDTO> _items = [];
+  late final AuthProvider authProvider;
+  final TaskRepository _taskRepository = TaskRepository(TaskService());
+  final CategoryRepository _categoryRepository = CategoryRepository(CategoryService());
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
@@ -25,6 +35,13 @@ class _MyWidgetState extends State<HomeScreen> {
     Center(child: Text("Profile Page", style: TextStyle(color: Colors.white))),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _fetchTasks(authProvider.currentUser?.id ?? '');
+  }
+
   void _onNavTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -32,12 +49,30 @@ class _MyWidgetState extends State<HomeScreen> {
   }
 
   void _onAddPressed() {
-    // showModalBottomSheet(
-    //   context: context,
-    //   isScrollControlled: true,
-    //   backgroundColor: Colors.transparent,
-    //   builder: (context) => const AddTaskBottomSheet(),
-    // );
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddTaskBottomSheet(),
+    );
+  }
+
+  void _fetchTasks(String userId) {
+    final userId = authProvider.currentUser?.id ?? '';
+    if (userId.isEmpty) {
+      return;
+    }
+    _taskRepository.getTasks(userId).then((tasks) {
+      setState(() {
+        _items.clear();
+        _items.addAll(tasks);
+      });
+      for (var task in _items) {
+        print("Task: ${task.name}, Category ID: ${task.categoryId}");
+      }
+    }).catchError((error) {
+      print("Error fetching tasks: $error");
+    });
   }
 
   @override
@@ -50,6 +85,13 @@ class _MyWidgetState extends State<HomeScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
+                Header(),
+                IconButton(
+                  icon: Icon(Icons.logout, color: Colors.white),
+                  onPressed: () {
+                    Provider.of<AuthProvider>(context, listen: false).logout();
+                  },
+                ),
                 SizedBox(height: 16),
                 _items.isEmpty
                     ? Container(
@@ -58,12 +100,6 @@ class _MyWidgetState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            IconButton(
-                              icon: Icon(Icons.logout, color: Colors.white),
-                              onPressed: () {
-                                Provider.of<AuthProvider>(context, listen: false).logout();
-                              },
-                            ),
                             Image(image: AssetImage('assets/images/Checklist-rafiki_1.png')),
                             Text(
                               'What do you want to do today?',
@@ -86,14 +122,28 @@ class _MyWidgetState extends State<HomeScreen> {
                         ),
                       )
                     : Container(
-                        child: Column(
-                          children: [
-                            SearchBar(
-                              hintText: "Search tasks",
-                              onChanged: (value) {},
-                            ),
-                            SizedBox(height: 16),
-                          ],
+                        padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: _items.length,
+                          itemBuilder: (context, index) {
+                            final task = _items[index];
+                            final userId = authProvider.currentUser?.id ?? '';
+                            return FutureBuilder(
+                              future: _categoryRepository.getCategoryById(userId, task.categoryId),
+                              builder: (context, snapshot) {
+                                final category = snapshot.data;
+                                return TaskItem(
+                                  title: task.name,
+                                  timeText: task.description ?? '',
+                                  categoryLabel: category?.name ?? '',
+                                  categoryIcon: category?.img,
+                                  priorityLabel: task.priority,
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
               ],

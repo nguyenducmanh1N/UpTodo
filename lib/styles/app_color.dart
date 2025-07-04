@@ -11,7 +11,7 @@ class AppColor {
   static const Color upToDoBgSecondary = Color.fromRGBO(54, 54, 54, 1);
   static const Color upToDoBgPrimary = Color.fromRGBO(39, 39, 39, 1);
 
-  static const Color yeallow = Color(0xFFEDE861);
+  static const Color yellow = Color(0xFFEDE861);
   static const Color green = Color(0xFF61ED7A);
   static const Color cyan = Color(0xFF61EDE6);
   static const Color lightBlue = Color(0xFF6195ED);
