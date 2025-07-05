@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:uptodo/providers/auth_provider.dart';
 import 'package:uptodo/widgets/home_screen.dart';
 import 'widgets/auth/login_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  await dotenv.load();
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthProvider(),
