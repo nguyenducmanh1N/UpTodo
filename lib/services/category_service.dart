@@ -21,6 +21,7 @@ class CategoryService {
       }
       return jsonList.map((json) => CategoryDTO.fromJson(json)).toList();
     } catch (e) {
+      print('Error in getCategories: $e');
       return [];
     }
   }
@@ -39,7 +40,6 @@ class CategoryService {
 
   Future<CategoryDTO?> getCategoryById(String userId, String categoryId) async {
     final categories = await getCategories(userId);
-
     return categories.firstWhereOrNull((category) => category.id == categoryId);
   }
 }

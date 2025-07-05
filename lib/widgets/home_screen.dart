@@ -53,7 +53,11 @@ class _MyWidgetState extends State<HomeScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddTaskBottomSheet(),
+      builder: (context) => AddTaskBottomSheet(
+        onTaskAdded: () {
+          _fetchTasks(authProvider.currentUser?.id ?? '');
+        },
+      ),
     );
   }
 
@@ -67,11 +71,8 @@ class _MyWidgetState extends State<HomeScreen> {
         _items.clear();
         _items.addAll(tasks);
       });
-      for (var task in _items) {
-        print("Task: ${task.name}, Category ID: ${task.categoryId}");
-      }
-    }).catchError((error) {
-      print("Error fetching tasks: $error");
+    }).catchError((e) {
+      print("Error fetching tasks: $e");
     });
   }
 

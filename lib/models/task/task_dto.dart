@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'task_dto.freezed.dart';
@@ -9,8 +10,7 @@ class TaskDTO with _$TaskDTO {
     required String id,
     required String name,
     String? description,
-    required String date,
-    required String time,
+    required DateTime date,
     required String categoryId,
     required String priority,
     bool? isCompleted,
