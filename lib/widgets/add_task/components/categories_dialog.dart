@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:uptodo/models/category/category_dto.dart';
 import 'package:uptodo/providers/auth_provider.dart';
 import 'package:uptodo/repositories/category_repository.dart';
-import 'package:uptodo/repositories/images_storage_repository.dart';
 import 'package:uptodo/services/category_service.dart';
-import 'package:uptodo/services/images_storage_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/color_utils.dart';
@@ -47,6 +45,9 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
     try {
       final userId = authProvider.currentUser?.id ?? '';
       final categories = await _categoryRepository.getCategories(userId);
+      for (var category in categories) {
+        print('Category: ${category.name}, Color: ${category.color}, Image: ${category.img}');
+      }
       setState(() {
         _categories = categories;
         _isLoading = false;
@@ -143,7 +144,6 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
             ElevatedButton(
               onPressed: () {
                 _onAddCategoryPressed(context);
-                _loadCategories();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColor.upToDoPrimary,
@@ -174,10 +174,11 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
     Navigator.pop(context, id);
   }
 
-  void _onAddCategoryPressed(BuildContext context) {
-    Navigator.push(
+  void _onAddCategoryPressed(BuildContext context) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AddCategoryScreen()),
     );
+    await _loadCategories();
   }
 }
