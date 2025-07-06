@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class PriorityUtils {
   static final List<Map<String, dynamic>> priorities = [
     {'key': '1', 'label': '1', 'icon': 'assets/images/flag_icon.png'},

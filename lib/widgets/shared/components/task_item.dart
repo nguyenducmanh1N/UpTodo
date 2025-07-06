@@ -2,25 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/color_utils.dart';
+import 'package:uptodo/utils/format_time_utils.dart';
 
 class TaskItem extends StatelessWidget {
-  final String title;
-  final String timeText;
+  final String name;
+  final DateTime time;
   final String categoryLabel;
-  final String? categoryIcon;
   final String priorityLabel;
   final String? categoryImgUrl;
   final String? categoryColorKey;
+  final VoidCallback onTap;
+  final bool isCompleted;
+  final VoidCallback? setTaskCompleted;
 
   const TaskItem({
     super.key,
-    required this.title,
-    required this.timeText,
+    required this.name,
+    required this.time,
     required this.categoryLabel,
-    this.categoryIcon,
     required this.priorityLabel,
     this.categoryImgUrl,
     this.categoryColorKey,
+    required this.onTap,
+    required this.isCompleted,
+    this.setTaskCompleted,
   });
 
   @override
@@ -34,36 +39,50 @@ class TaskItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 22,
-            height: 22,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColor.upToDoWhile, width: 2),
+          GestureDetector(
+            onTap: setTaskCompleted,
+            child: Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: isCompleted ? AppColor.green : AppColor.upToDoWhile, width: 2),
+                color: isCompleted ? AppColor.upToDoPrimary : AppColor.upToDoBorder,
+              ),
+              child: isCompleted
+                  ? Icon(
+                      Icons.check,
+                      color: AppColor.upToDoWhile,
+                      size: 16,
+                    )
+                  : null,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTextStyles.displaySmall.copyWith(
-                    color: AppColor.upToDoWhile,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
+            child: GestureDetector(
+              onTap: onTap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: AppTextStyles.displaySmall.copyWith(
+                      color: AppColor.upToDoWhile,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  timeText,
-                  style: AppTextStyles.displaySmall.copyWith(
-                    color: Colors.white54,
-                    fontSize: 15,
+                  const SizedBox(height: 2),
+                  Text(
+                    FormatTimeUtils.formatTaskTime(time),
+                    style: AppTextStyles.displaySmall.copyWith(
+                      color: AppColor.upToDoBorder,
+                      fontSize: 15,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Container(
@@ -100,7 +119,7 @@ class TaskItem extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border.all(color: AppColor.upToDoPrimary, width: 1.5),
               borderRadius: BorderRadius.circular(6),
-              color: Colors.transparent,
+              color: AppColor.upToDoBgSecondary,
             ),
             child: Row(
               children: [

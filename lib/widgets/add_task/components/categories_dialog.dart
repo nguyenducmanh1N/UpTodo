@@ -20,7 +20,6 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   final CategoryRepository _categoryRepository = CategoryRepository(CategoryService());
   late final AuthProvider authProvider;
   List<CategoryDTO> _categories = [];
-  bool _isLoading = true;
 
   @override
   void initState() {
@@ -38,27 +37,16 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   }
 
   Future<void> _loadCategories() async {
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
       final userId = authProvider.currentUser?.id ?? '';
       final categories = await _categoryRepository.getCategories(userId);
-      for (var category in categories) {
-        print('Category: ${category.name}, Color: ${category.color}, Image: ${category.img}');
-      }
       setState(() {
         _categories = categories;
-        _isLoading = false;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saving category: $e')),
       );
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -99,7 +87,6 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
                   itemCount: _categories.length,
                   itemBuilder: (context, index) {
                     final category = _categories[index];
-
                     return GestureDetector(
                       onTap: () {},
                       child: Column(
@@ -174,11 +161,10 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
     Navigator.pop(context, id);
   }
 
-  void _onAddCategoryPressed(BuildContext context) async {
-    await Navigator.push(
+  void _onAddCategoryPressed(BuildContext context) {
+    Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddCategoryScreen()),
+      MaterialPageRoute(builder: (context) => AddCategoryScreen(categories: _categories)),
     );
-    await _loadCategories();
   }
 }

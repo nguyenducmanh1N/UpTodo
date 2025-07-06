@@ -22,6 +22,23 @@ class _DateDialogState extends State<DateDialog> {
     });
   }
 
+  void _onTimeSelected(TimeOfDay selectedTime) {
+    setState(() {
+      _selectedTime = selectedTime;
+    });
+  }
+
+  void _handleDateTimeSelection() {
+    final combinedDateTime = DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+      _selectedTime.hour,
+      _selectedTime.minute,
+    );
+    Navigator.pop(context, combinedDateTime);
+  }
+
   Widget _buildCalendar() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -100,7 +117,7 @@ class _DateDialogState extends State<DateDialog> {
                 color: AppColor.upToDoWhile,
               ),
             ),
-            const Divider(height: 24, color: Colors.white24),
+            const Divider(height: 24, color: AppColor.upToDoBgSecondary),
             SizedBox(
               height: 180,
               child: CupertinoDatePicker(
@@ -131,17 +148,8 @@ class _DateDialogState extends State<DateDialog> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      _selectedTime = tempTime;
-                    });
-                    final combinedDateTime = DateTime(
-                      _selectedDate.year,
-                      _selectedDate.month,
-                      _selectedDate.day,
-                      _selectedTime.hour,
-                      _selectedTime.minute,
-                    );
-                    Navigator.pop(context, combinedDateTime);
+                    _onTimeSelected(tempTime);
+                    _handleDateTimeSelection();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.upToDoPrimary,

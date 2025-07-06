@@ -5,16 +5,16 @@ import 'package:uptodo/providers/auth_provider.dart';
 import 'package:uptodo/repositories/task_repository.dart';
 import 'package:uptodo/services/task_service.dart';
 import 'package:uptodo/styles/app_color.dart';
-import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/widgets/add_task/components/categories_dialog.dart';
 import 'package:uptodo/widgets/add_task/components/date_dialog.dart';
 import 'package:uptodo/widgets/add_task/components/priorities_dialog.dart';
-import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
+import 'package:uptodo/widgets/add_task/components/task_input_form_files.dart';
 import 'package:uuid/uuid.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
   final VoidCallback? onTaskAdded;
-  const AddTaskBottomSheet({super.key, this.onTaskAdded});
+  final List<TaskDTO> tasks;
+  const AddTaskBottomSheet({super.key, this.onTaskAdded, required this.tasks});
 
   @override
   State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
@@ -23,13 +23,11 @@ class AddTaskBottomSheet extends StatefulWidget {
 class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   final TaskRepository _taskRepository = TaskRepository(TaskService());
   late final AuthProvider authProvider;
-  String description = '';
-  String name = '';
-  String? _nameError;
-  String? _descriptionError;
-  DateTime? selectedDate;
-  String? selectedCategory;
-  String? selectedPriority;
+  String _name = '';
+  String _description = '';
+  DateTime? _selectedDate;
+  String? _selectedCategoryId;
+  String? _selectedPriority;
 
   @override
   void initState() {
@@ -37,44 +35,22 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
-  void _onNameChanged(String value) {
-    setState(() {
-      if (value.trim().isEmpty) {
-        _nameError = 'Task name cannot be empty';
-        return;
-      }
-      _nameError = null;
-      name = value;
-    });
-  }
-
-  void _onDescriptionChanged(String value) {
-    setState(() {
-      if (value.trim().isEmpty) {
-        _descriptionError = 'Task description cannot be empty';
-        return;
-      }
-      _descriptionError = null;
-      description = value;
-    });
-  }
-
   bool _validateFields() {
-    if (selectedDate == null) {
+    if (_selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please select a date')),
       );
       return false;
     }
 
-    if (selectedCategory == null) {
+    if (_selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please select a category')),
       );
       return false;
     }
 
-    if (selectedPriority == null) {
+    if (_selectedPriority == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please select a priority')),
       );
@@ -85,19 +61,19 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
   void _updateSelectedDate(DateTime date) {
     setState(() {
-      selectedDate = date;
+      _selectedDate = date;
     });
   }
 
   void _updateSelectedPriority(String priority) {
     setState(() {
-      selectedPriority = priority;
+      _selectedPriority = priority;
     });
   }
 
-  void _updateSelectedCategory(String categoryId) {
+  void _updateSelectedCategoryId(String categoryId) {
     setState(() {
-      selectedCategory = categoryId;
+      _selectedCategoryId = categoryId;
     });
   }
 
@@ -109,11 +85,11 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     final uuid = Uuid();
     final task = TaskDTO(
       id: uuid.v4(),
-      name: name,
-      description: description,
-      date: selectedDate!,
-      categoryId: selectedCategory!,
-      priority: selectedPriority!,
+      name: _name,
+      description: _description,
+      date: _selectedDate!,
+      categoryId: _selectedCategoryId!,
+      priority: _selectedPriority!,
       isCompleted: false,
     );
     final userId = authProvider.currentUser?.id ?? '';
@@ -152,40 +128,14 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Add Task",
-              style: AppTextStyles.displayLarge.copyWith(
-                color: AppColor.upToDoWhile,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "Task Name",
-              style: AppTextStyles.displaySmall.copyWith(
-                color: AppColor.upToDoKeyPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            CustomTextField(
-              onChanged: _onNameChanged,
-              hintText: "Task name",
-              obscureText: false,
-              errorText: _nameError,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "Task Description",
-              style: AppTextStyles.displaySmall.copyWith(
-                color: AppColor.upToDoKeyPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            CustomTextField(
-              onChanged: _onDescriptionChanged,
-              hintText: "Task description",
-              obscureText: false,
-              errorText: _descriptionError,
-            ),
+            TaskInputFormFiles(
+                categoryId: _selectedCategoryId,
+                onFormChanged: (name, description) {
+                  setState(() {
+                    _name = name;
+                    _description = description;
+                  });
+                }),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -195,21 +145,21 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                     GestureDetector(
                       onTap: () => _showDateDialog(context),
                       child: SizedBox(
-                        child: Image(image: AssetImage('assets/images/timer_icon.png'), width: 34, height: 34),
+                        child: Image.asset('assets/images/timer_icon.png', width: 34, height: 34),
                       ),
                     ),
                     const SizedBox(width: 20),
                     GestureDetector(
                       onTap: () => _showCategoriesDialog(context),
                       child: SizedBox(
-                        child: Image(image: AssetImage('assets/images/tag_icon.png'), width: 34, height: 34),
+                        child: Image.asset('assets/images/tag_icon.png', width: 34, height: 34),
                       ),
                     ),
                     const SizedBox(width: 20),
                     GestureDetector(
                       onTap: () => _showPrioritiesDialog(context),
                       child: SizedBox(
-                        child: Image(image: AssetImage('assets/images/flag_icon.png'), width: 34, height: 34),
+                        child: Image.asset('assets/images/flag_icon.png', width: 34, height: 34),
                       ),
                     ),
                   ],
@@ -217,7 +167,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 GestureDetector(
                   onTap: _handleSaveTask,
                   child: SizedBox(
-                    child: Image(image: AssetImage('assets/images/send_icon.png'), width: 34, height: 34),
+                    child: Image.asset('assets/images/send_icon.png', width: 34, height: 34),
                   ),
                 ),
               ],
@@ -255,7 +205,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       builder: (context) => CategoriesDialog(),
     );
     if (categoryId != null) {
-      _updateSelectedCategory(categoryId);
+      _updateSelectedCategoryId(categoryId);
     }
   }
 }
