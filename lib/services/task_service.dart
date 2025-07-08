@@ -3,8 +3,6 @@ import 'package:uptodo/constants/shared_preferences.dart';
 import 'package:uptodo/models/task/task_dto.dart';
 import 'dart:convert';
 
-import 'package:uptodo/models/user/user_dto.dart';
-
 class TaskService {
   final String key = SharedPreferencesKeys.tasksKey;
   String _userTasksKey(String userId) => '${key}_$userId';
