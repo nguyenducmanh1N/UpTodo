@@ -65,18 +65,17 @@ class _LoginScreenState extends State<LoginScreen> {
     if (loginResponse != null) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       authProvider.login(loginResponse);
-      print('Login successful: $loginResponse');
-    } else {
-      setState(() {
-        _errorMessage = 'Login failed. Please check your credentials.';
-      });
+      return;
     }
+    setState(() {
+      _errorMessage = 'Login failed. Please check your credentials.';
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColor.upToDoBlack,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Center(
@@ -118,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     _errorMessage,
                     style: AppTextStyles.displaySmall.copyWith(
-                      color: Colors.red,
+                      color: AppColor.red,
                     ),
                   ),
                 ],
