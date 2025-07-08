@@ -7,8 +7,8 @@ import 'package:uptodo/repositories/auth_repository.dart';
 import 'package:uptodo/services/auth_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
-import 'package:uptodo/utils/email_validator.dart';
-import 'package:uptodo/utils/password_validator.dart';
+import 'package:uptodo/utils/validator/email_validator.dart';
+import 'package:uptodo/utils/validator/password_validator.dart';
 import 'package:uptodo/widgets/auth/components/custom_button.dart';
 import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
 import 'package:uptodo/widgets/auth/components/social_button.dart';
@@ -64,19 +64,18 @@ class _LoginScreenState extends State<LoginScreen> {
     final loginResponse = await _authRepository.login(_username, _password);
     if (loginResponse != null) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.login();
-      print('Login successful: $loginResponse');
-    } else {
-      setState(() {
-        _errorMessage = 'Login failed. Please check your credentials.';
-      });
+      authProvider.login(loginResponse);
+      return;
     }
+    setState(() {
+      _errorMessage = 'Login failed. Please check your credentials.';
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColor.upToDoBlack,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Center(
@@ -118,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     _errorMessage,
                     style: AppTextStyles.displaySmall.copyWith(
-                      color: Colors.red,
+                      color: AppColor.red,
                     ),
                   ),
                 ],
