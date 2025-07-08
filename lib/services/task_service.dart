@@ -57,4 +57,25 @@ class TaskService {
       return false;
     }
   }
+
+  Future<void> deleteTaskById(String userId, String taskId) async {
+    try {
+      final sharedPreferences = await SharedPreferences.getInstance();
+      final List<TaskDTO> tasks = await getTasks(userId);
+      tasks.removeWhere((task) => task.id == taskId);
+      final String tasksJson = jsonEncode(tasks.map((e) => e.toJson()).toList());
+      await sharedPreferences.setString(_userTasksKey(userId), tasksJson);
+    } catch (e) {
+      throw Exception('Failed to delete task: $e');
+    }
+  }
+
+  Future<TaskDTO> getTaskById(String userId, String taskId) async {
+    try {
+      final tasks = await getTasks(userId);
+      return tasks.firstWhere((task) => task.id == taskId, orElse: () => throw Exception('Task not found'));
+    } catch (e) {
+      throw Exception('Failed to get task by ID: $e');
+    }
+  }
 }

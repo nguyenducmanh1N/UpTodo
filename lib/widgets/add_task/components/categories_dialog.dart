@@ -10,7 +10,8 @@ import 'package:uptodo/utils/color_utils.dart';
 import 'package:uptodo/widgets/add_category/add_category_screen.dart';
 
 class CategoriesDialog extends StatefulWidget {
-  const CategoriesDialog({super.key});
+  String? initialCategoryId;
+  CategoriesDialog({super.key, this.initialCategoryId});
 
   @override
   State<CategoriesDialog> createState() => _CategoriesDialogState();
@@ -20,11 +21,13 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   final CategoryRepository _categoryRepository = CategoryRepository(CategoryService());
   late final AuthProvider authProvider;
   List<CategoryDTO> _categories = [];
+  String? _selectedCategoryId;
 
   @override
   void initState() {
     super.initState();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _selectedCategoryId = widget.initialCategoryId;
     _loadCategories();
   }
 
@@ -87,21 +90,26 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
                   itemCount: _categories.length,
                   itemBuilder: (context, index) {
                     final category = _categories[index];
-                    return GestureDetector(
-                      onTap: () {},
-                      child: Column(
-                        children: [
-                          Container(
+                    final isSelected = _selectedCategoryId == category.id;
+                    return Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _onCategorySelected(category.id);
+                          },
+                          child: Container(
                             height: 60,
                             width: 60,
                             decoration: BoxDecoration(
                               color: _getColorFromCategory(category.color),
                               borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: isSelected ? AppColor.upToDoPrimary : AppColor.upToDoWhile,
+                                width: isSelected ? 3 : 2,
+                              ),
                             ),
-                            child: GestureDetector(
-                              onTap: () {
-                                _onCategorySelected(category.id);
-                              },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
                               child: Image(
                                 image: category.img.isNotEmpty
                                     ? NetworkImage(
@@ -110,18 +118,19 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
                                     : AssetImage(
                                         'assets/images/image_not_found.png',
                                       ),
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            category.name,
-                            style: AppTextStyles.displaySmall.copyWith(
-                              color: AppColor.upToDoWhile,
-                            ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          category.name,
+                          style: AppTextStyles.displaySmall.copyWith(
+                            color: isSelected ? AppColor.upToDoPrimary : AppColor.upToDoWhile,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 ),
@@ -158,7 +167,10 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   }
 
   void _onCategorySelected(String id) {
-    Navigator.pop(context, id);
+    setState(() {
+      _selectedCategoryId = id;
+    });
+    Navigator.pop(context, _selectedCategoryId);
   }
 
   void _onAddCategoryPressed(BuildContext context) {

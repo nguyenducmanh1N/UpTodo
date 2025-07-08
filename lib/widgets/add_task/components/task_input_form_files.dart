@@ -11,12 +11,15 @@ import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
 
 class TaskInputFormFiles extends StatefulWidget {
   final String? categoryId;
-  final TaskDTO? task;
+  final String? initialName;
+  final String? initialDescription;
   final Function(String, String)? onFormChanged;
+
   const TaskInputFormFiles({
     super.key,
     this.categoryId,
-    this.task,
+    this.initialName,
+    this.initialDescription,
     this.onFormChanged,
   });
 
@@ -36,10 +39,6 @@ class _TaskInputFormFilesState extends State<TaskInputFormFiles> {
   void initState() {
     super.initState();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (widget.task != null) {
-      name = widget.task!.name;
-      description = widget.task!.description!;
-    }
   }
 
   @override
@@ -97,12 +96,6 @@ class _TaskInputFormFilesState extends State<TaskInputFormFiles> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Add Task",
-          style: AppTextStyles.displayLarge.copyWith(
-            color: AppColor.upToDoWhile,
-          ),
-        ),
         const SizedBox(height: 16),
         Text(
           "Task Name",
@@ -116,6 +109,7 @@ class _TaskInputFormFilesState extends State<TaskInputFormFiles> {
           hintText: "Task name",
           obscureText: false,
           errorText: _nameError,
+          initialValue: widget.initialName,
         ),
         const SizedBox(height: 16),
         Text(
@@ -130,6 +124,7 @@ class _TaskInputFormFilesState extends State<TaskInputFormFiles> {
           hintText: "Task description",
           obscureText: false,
           errorText: _descriptionError,
+          initialValue: widget.initialDescription,
         ),
       ],
     );
