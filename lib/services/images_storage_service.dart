@@ -44,7 +44,6 @@ class ImagesStorageService {
         final jsonMap = jsonDecode(response.body);
         return jsonMap['result'] as String?;
       }
-
       return null;
     } catch (e) {
       throw Exception('Failed to delete image: $e');

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uptodo/models/task/task_dto.dart';
@@ -36,6 +37,13 @@ class _MyWidgetState extends State<HomeScreen> {
   TaskFilter _selectedFilter = TaskFilter.all;
   TaskSortType _selectedSort = TaskSortType.priority;
   TaskStatus _selectedStatus = TaskStatus.completed;
+
+  @override
+  void initState() {
+    super.initState();
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _fetchTasks(authProvider.currentUser?.id ?? '');
+  }
 
   @override
   void initState() {

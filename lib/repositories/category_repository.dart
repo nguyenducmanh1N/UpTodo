@@ -16,7 +16,7 @@ class CategoryRepository {
   Future<CategoryDTO?> getCategoryById(String userId, String categoryId) async {
     return await _categoryService.getCategoryById(userId, categoryId);
   }
-
+  
   Future<bool> checkCategoryExists(String userId, String categoryName) async {
     return await _categoryService.checkCategoryExists(userId, categoryName);
   }

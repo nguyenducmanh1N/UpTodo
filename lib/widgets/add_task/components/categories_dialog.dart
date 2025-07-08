@@ -41,7 +41,7 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
       final userId = authProvider.currentUser?.id ?? '';
       final categories = await _categoryRepository.getCategories(userId);
       setState(() {
-        _categories = categories;
+        _categories = categories;r
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
