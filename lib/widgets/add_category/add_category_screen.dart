@@ -12,6 +12,7 @@ import 'package:uptodo/services/images_storage_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/color_utils.dart';
+import 'package:uptodo/utils/validator/text_input_validator.dart';
 import 'package:uptodo/widgets/add_category/components/category_color_widget.dart';
 import 'package:uptodo/widgets/auth/components/custom_text_field.dart';
 import 'package:uuid/uuid.dart';
@@ -39,14 +40,26 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
-  void _onCategoryNameChanged(String value) {
+  void _onCategoryNameChanged(String value) async {
     setState(() {
-      if (value.trim().isEmpty) {
-        _categoryNameError = 'Category name cannot be empty';
+      final trimmedValue = value.trim();
+
+      if (trimmedValue.isEmpty) {
+        _categoryNameError = TextInput.dirty(value).error?.errorMessage;
         return;
       }
+
+      _categoryName = trimmedValue;
       _categoryNameError = null;
-      _categoryName = value;
+    });
+
+    final userId = authProvider.currentUser?.id ?? '';
+    final exists = await _categoryRepository.checkCategoryExists(userId, _categoryName);
+
+    setState(() {
+      if (exists == true) {
+        _categoryNameError = 'Category name already exists';
+      }
     });
   }
 

@@ -25,7 +25,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _confirmPasswordError;
   String _errorMessage = '';
   bool _isButtonEnabled = false;
-  Timer? _debounce;
   String _email = '';
   String _password = '';
   String _confirmPassword = '';

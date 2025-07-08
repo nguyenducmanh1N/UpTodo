@@ -33,13 +33,25 @@ class CategoryService {
       final String categoriesJson = json.encode(categories.map((c) => c.toJson()).toList());
       await sharedPreferences.setString(_userCategoriesKey(userId), categoriesJson);
     } catch (e) {
-      print('Error saving category: $e');
+      throw Exception('Failed to save category: $e');
     }
   }
 
   Future<CategoryDTO?> getCategoryById(String userId, String categoryId) async {
-    final categories = await getCategories(userId);
+    try {
+      final categories = await getCategories(userId);
+      return categories.firstWhereOrNull((category) => category.id == categoryId);
+    } catch (e) {
+      return null;
+    }
+  }
 
-    return categories.firstWhereOrNull((category) => category.id == categoryId);
+  Future<bool> checkCategoryExists(String userId, String categoryName) async {
+    try {
+      final categories = await getCategories(userId);
+      return categories.any((category) => category.name.trim().toLowerCase() == categoryName.trim().toLowerCase());
+    } catch (e) {
+      return false;
+    }
   }
 }

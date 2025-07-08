@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:uptodo/models/category/category_dto.dart';
 import 'package:uptodo/providers/auth_provider.dart';
 import 'package:uptodo/repositories/category_repository.dart';
-import 'package:uptodo/repositories/images_storage_repository.dart';
 import 'package:uptodo/services/category_service.dart';
-import 'package:uptodo/services/images_storage_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/color_utils.dart';
@@ -22,7 +20,6 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   final CategoryRepository _categoryRepository = CategoryRepository(CategoryService());
   late final AuthProvider authProvider;
   List<CategoryDTO> _categories = [];
-  bool _isLoading = true;
 
   @override
   void initState() {
@@ -40,24 +37,16 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   }
 
   Future<void> _loadCategories() async {
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
       final userId = authProvider.currentUser?.id ?? '';
       final categories = await _categoryRepository.getCategories(userId);
       setState(() {
-        _categories = categories;
-        _isLoading = false;
+        _categories = categories;r
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saving category: $e')),
       );
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -98,7 +87,6 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
                   itemCount: _categories.length,
                   itemBuilder: (context, index) {
                     final category = _categories[index];
-
                     return GestureDetector(
                       onTap: () {},
                       child: Column(
@@ -143,7 +131,6 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
             ElevatedButton(
               onPressed: () {
                 _onAddCategoryPressed(context);
-                _loadCategories();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColor.upToDoPrimary,
@@ -177,7 +164,7 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   void _onAddCategoryPressed(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddCategoryScreen()),
+      MaterialPageRoute(builder: (context) => AddCategoryScreen(categories: _categories)),
     );
   }
 }

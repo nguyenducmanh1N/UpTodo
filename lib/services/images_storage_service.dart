@@ -21,10 +21,9 @@ class ImagesStorageService {
       final responseData = await http.Response.fromStream(response);
       final data = json.decode(responseData.body);
       return data['secure_url'];
-    } else {
-      print('Upload failed: ${response.statusCode}');
-      return null;
     }
+
+    return null;
   }
 
   Future<String?> deleteImage(String publicId) async {
@@ -44,13 +43,10 @@ class ImagesStorageService {
       if (response.statusCode == 200) {
         final jsonMap = jsonDecode(response.body);
         return jsonMap['result'] as String?;
-      } else {
-        print('Cloudinary delete failed: ${response.statusCode}');
-        return null;
       }
-    } catch (e) {
-      print('Error deleting image from Cloudinary: $e');
       return null;
+    } catch (e) {
+      throw Exception('Failed to delete image: $e');
     }
   }
 }

@@ -23,8 +23,7 @@ mixin _$TaskDTO {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
-  String get date => throw _privateConstructorUsedError;
-  String get time => throw _privateConstructorUsedError;
+  DateTime get date => throw _privateConstructorUsedError;
   String get categoryId => throw _privateConstructorUsedError;
   String get priority => throw _privateConstructorUsedError;
   bool? get isCompleted => throw _privateConstructorUsedError;
@@ -48,8 +47,7 @@ abstract class $TaskDTOCopyWith<$Res> {
       {String id,
       String name,
       String? description,
-      String date,
-      String time,
+      DateTime date,
       String categoryId,
       String priority,
       bool? isCompleted,
@@ -75,7 +73,6 @@ class _$TaskDTOCopyWithImpl<$Res, $Val extends TaskDTO>
     Object? name = null,
     Object? description = freezed,
     Object? date = null,
-    Object? time = null,
     Object? categoryId = null,
     Object? priority = null,
     Object? isCompleted = freezed,
@@ -97,11 +94,7 @@ class _$TaskDTOCopyWithImpl<$Res, $Val extends TaskDTO>
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
-              as String,
-      time: null == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DateTime,
       categoryId: null == categoryId
           ? _value.categoryId
           : categoryId // ignore: cast_nullable_to_non_nullable
@@ -133,8 +126,7 @@ abstract class _$$TaskDTOImplCopyWith<$Res> implements $TaskDTOCopyWith<$Res> {
       {String id,
       String name,
       String? description,
-      String date,
-      String time,
+      DateTime date,
       String categoryId,
       String priority,
       bool? isCompleted,
@@ -158,7 +150,6 @@ class __$$TaskDTOImplCopyWithImpl<$Res>
     Object? name = null,
     Object? description = freezed,
     Object? date = null,
-    Object? time = null,
     Object? categoryId = null,
     Object? priority = null,
     Object? isCompleted = freezed,
@@ -180,11 +171,7 @@ class __$$TaskDTOImplCopyWithImpl<$Res>
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
-              as String,
-      time: null == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DateTime,
       categoryId: null == categoryId
           ? _value.categoryId
           : categoryId // ignore: cast_nullable_to_non_nullable
@@ -213,7 +200,6 @@ class _$TaskDTOImpl implements _TaskDTO {
       required this.name,
       this.description,
       required this.date,
-      required this.time,
       required this.categoryId,
       required this.priority,
       this.isCompleted,
@@ -230,9 +216,7 @@ class _$TaskDTOImpl implements _TaskDTO {
   @override
   final String? description;
   @override
-  final String date;
-  @override
-  final String time;
+  final DateTime date;
   @override
   final String categoryId;
   @override
@@ -250,7 +234,7 @@ class _$TaskDTOImpl implements _TaskDTO {
 
   @override
   String toString() {
-    return 'TaskDTO(id: $id, name: $name, description: $description, date: $date, time: $time, categoryId: $categoryId, priority: $priority, isCompleted: $isCompleted, subtask: $subtask)';
+    return 'TaskDTO(id: $id, name: $name, description: $description, date: $date, categoryId: $categoryId, priority: $priority, isCompleted: $isCompleted, subtask: $subtask)';
   }
 
   @override
@@ -263,7 +247,6 @@ class _$TaskDTOImpl implements _TaskDTO {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.date, date) || other.date == date) &&
-            (identical(other.time, time) || other.time == time) &&
             (identical(other.categoryId, categoryId) ||
                 other.categoryId == categoryId) &&
             (identical(other.priority, priority) ||
@@ -281,7 +264,6 @@ class _$TaskDTOImpl implements _TaskDTO {
       name,
       description,
       date,
-      time,
       categoryId,
       priority,
       isCompleted,
@@ -308,8 +290,7 @@ abstract class _TaskDTO implements TaskDTO {
       {required final String id,
       required final String name,
       final String? description,
-      required final String date,
-      required final String time,
+      required final DateTime date,
       required final String categoryId,
       required final String priority,
       final bool? isCompleted,
@@ -324,9 +305,7 @@ abstract class _TaskDTO implements TaskDTO {
   @override
   String? get description;
   @override
-  String get date;
-  @override
-  String get time;
+  DateTime get date;
   @override
   String get categoryId;
   @override
