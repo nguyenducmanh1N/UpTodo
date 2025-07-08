@@ -41,7 +41,7 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
       final userId = authProvider.currentUser?.id ?? '';
       final categories = await _categoryRepository.getCategories(userId);
       setState(() {
-        _categories = categories;r
+        _categories = categories;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -164,7 +164,7 @@ class _CategoriesDialogState extends State<CategoriesDialog> {
   void _onAddCategoryPressed(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddCategoryScreen(categories: _categories)),
+      MaterialPageRoute(builder: (context) => AddCategoryScreen()),
     );
   }
 }
