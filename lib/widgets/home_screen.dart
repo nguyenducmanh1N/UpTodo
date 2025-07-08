@@ -8,15 +8,14 @@ import 'package:uptodo/services/category_service.dart';
 import 'package:uptodo/services/task_service.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
-import 'package:uptodo/utils/task_filter_utils.dart';
-import 'package:uptodo/utils/task_sort_utils.dart';
-import 'package:uptodo/utils/task_status_utils.dart';
+import 'package:uptodo/utils/task_utils/task_filter_by_status_utils.dart';
+import 'package:uptodo/utils/task_utils/task_filter_utils.dart';
+import 'package:uptodo/utils/task_utils/task_sort_utils.dart';
 import 'package:uptodo/widgets/add_task/add_task_bottom_sheet.dart';
 import 'package:uptodo/widgets/shared/components/custom_bottom_navigation_bar.dart';
 import 'package:uptodo/widgets/shared/components/filter_dropdown.dart';
 import 'package:uptodo/widgets/shared/components/header.dart';
 import 'package:uptodo/widgets/shared/components/task_list.dart';
-import 'package:uptodo/widgets/task_detail/task_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -98,7 +97,8 @@ class _MyWidgetState extends State<HomeScreen> {
   }
 
   Future<void> _filterByStatus(TaskStatus status) async {
-    final filteredTasks = await TaskStatusUtils().filterTasksByStatus(_allTasks, status);
+    final filteredTasks = await TaskStatusUtils().filterTasksByStatus(_resultTasks, status);
+
     setState(() {
       _filteredTasksByStatus.clear();
       _filteredTasksByStatus.addAll(filteredTasks);
