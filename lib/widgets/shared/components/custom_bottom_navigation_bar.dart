@@ -21,69 +21,52 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 90,
+      height: 122,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Container(
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
             height: 90,
-            decoration: BoxDecoration(
+            child: Container(
               color: AppColor.upToDoBorder,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildButtonItem(
-                  image: Image.asset('assets/images/index.png'),
-                  label: 'Index',
-                  index: 0,
-                  isSelected: widget.currentIndex == 0,
-                ),
-                _buildButtonItem(
-                  image: Image.asset('assets/images/calendar.png'),
-                  label: 'Calendar',
-                  index: 1,
-                  isSelected: widget.currentIndex == 1,
-                ),
-                SizedBox(width: 64),
-                _buildButtonItem(
-                  image: Image.asset('assets/images/focus.png'),
-                  label: 'Focus',
-                  index: 2,
-                  isSelected: widget.currentIndex == 2,
-                ),
-                _buildButtonItem(
-                  image: Image.asset('assets/images/profile.png'),
-                  label: 'Profile',
-                  index: 3,
-                  isSelected: widget.currentIndex == 3,
-                ),
-              ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildButtonItem(label: 'Index', index: 0),
+                  _buildButtonItem(label: 'Calendar', index: 1),
+                  const SizedBox(width: 64),
+                  _buildButtonItem(label: 'Focus', index: 2),
+                  _buildButtonItem(label: 'Profile', index: 3),
+                ],
+              ),
             ),
           ),
           Positioned(
-            top: -32,
-            left: MediaQuery.of(context).size.width / 2 - 32,
+            top: 0,
+            left: MediaQuery.of(context).size.width / 2 - 45,
+            width: 90,
+            height: 90,
             child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
               onTap: widget.onAddButtonPressed,
               child: Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: AppColor.upToDoPrimary,
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColor.upToDoPrimary,
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
                 ),
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 30,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: AppColor.upToDoPrimary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: AppColor.upToDoWhile,
+                    size: 30,
+                  ),
                 ),
               ),
             ),
@@ -94,30 +77,28 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   }
 
   Widget _buildButtonItem({
-    required Image image,
     required String label,
     required int index,
-    required bool isSelected,
   }) {
+    final isSelected = widget.currentIndex == index;
     return GestureDetector(
       onTap: () => widget.onTabSelected(index),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image(
-              image: isSelected
-                  ? AssetImage('assets/images/${label.toLowerCase()}_selected.png')
-                  : AssetImage('assets/images/${label.toLowerCase()}.png'),
+            Image.asset(
+              'assets/images/${label.toLowerCase()}${isSelected ? '_selected' : ''}.png',
               width: 24,
               height: 24,
+              color: isSelected ? AppColor.upToDoPrimary : AppColor.upToDoWhile,
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? AppColor.upToDoPrimary : Colors.white,
+                color: isSelected ? AppColor.upToDoPrimary : AppColor.upToDoWhile,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),

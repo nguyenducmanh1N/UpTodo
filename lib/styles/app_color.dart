@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColor {
-  static const Color upToDoWhile = Color(0xffffffff);
+  static const Color upToDoWhite = Color(0xffffffff);
   static const Color upToDoBlack = Color(0xff000000);
 
   static const Color upToDoPrimary50 = Color.fromRGBO(134, 135, 231, 0.5);

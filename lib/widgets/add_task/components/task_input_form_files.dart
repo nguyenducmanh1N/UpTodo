@@ -13,6 +13,7 @@ class TaskInputFormFiles extends StatefulWidget {
   final String? categoryId;
   final TaskDTO? task;
   final Function(String, String)? onFormChanged;
+
   const TaskInputFormFiles({
     super.key,
     this.categoryId,
@@ -113,7 +114,7 @@ class _TaskInputFormFilesState extends State<TaskInputFormFiles> {
         const SizedBox(height: 8),
         CustomTextField(
           onChanged: _onNameChanged,
-          hintText: "Task name",
+          hintText: name.isNotEmpty ? name : "Task name",
           obscureText: false,
           errorText: _nameError,
         ),
@@ -127,7 +128,7 @@ class _TaskInputFormFilesState extends State<TaskInputFormFiles> {
         const SizedBox(height: 8),
         CustomTextField(
           onChanged: _onDescriptionChanged,
-          hintText: "Task description",
+          hintText: description.isNotEmpty ? description : "Task description",
           obscureText: false,
           errorText: _descriptionError,
         ),
