@@ -7,7 +7,6 @@ import 'package:uptodo/repositories/task_repository.dart';
 import 'package:uptodo/services/category_service.dart';
 import 'package:uptodo/services/task_service.dart';
 import 'package:uptodo/styles/app_color.dart';
-import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/task_utils/task_filter_by_status_utils.dart';
 import 'package:uptodo/utils/task_utils/task_filter_utils.dart';
 import 'package:uptodo/utils/task_utils/sort_task_utils.dart';
@@ -15,16 +14,18 @@ import 'package:uptodo/widgets/add_task/add_task_bottom_sheet.dart';
 import 'package:uptodo/widgets/shared/components/custom_bottom_navigation_bar.dart';
 import 'package:uptodo/widgets/shared/components/filter_dropdown.dart';
 import 'package:uptodo/widgets/shared/components/header.dart';
+import 'package:uptodo/widgets/shared/components/notification.dart';
 import 'package:uptodo/widgets/shared/components/task_list.dart';
+import 'package:uptodo/widgets/shared/empty_task_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _MyWidgetState();
+  State<HomeScreen> createState() => _HomeWidgetState();
 }
 
-class _MyWidgetState extends State<HomeScreen> {
+class _HomeWidgetState extends State<HomeScreen> {
   final List<TaskDTO> _allTasks = [];
   final List<TaskDTO> _resultTasks = [];
   final List<TaskDTO> _filteredTasksByStatus = [];
@@ -64,19 +65,21 @@ class _MyWidgetState extends State<HomeScreen> {
     );
   }
 
-  void _fetchTasks(String userId) {
+  Future<void> _fetchTasks(String userId) async {
     if (userId.isEmpty) {
       return;
     }
-    _taskRepository.getTasks(userId).then((tasks) {
+
+    try {
+      final tasks = await _taskRepository.getTasks(userId);
       setState(() {
         _allTasks.clear();
         _allTasks.addAll(tasks);
         _filterTasks(_selectedFilter);
       });
-    }).catchError((e) {
-      throw Exception('Failed to load tasks: $e');
-    });
+    } catch (e) {
+      TopNotification.showError(context, 'Error fetching tasks: $e');
+    }
   }
 
   Future<void> _filterTasks(TaskFilter? filterValue) async {
@@ -100,7 +103,6 @@ class _MyWidgetState extends State<HomeScreen> {
 
   Future<void> _filterByStatus(TaskStatus status) async {
     final filteredTasks = await TaskStatusUtils().filterTasksByStatus(_resultTasks, status);
-
     setState(() {
       _filteredTasksByStatus.clear();
       _filteredTasksByStatus.addAll(filteredTasks);
@@ -137,6 +139,37 @@ class _MyWidgetState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _updateTaskById(String taskId) async {
+    try {
+      final userId = authProvider.currentUser?.id ?? '';
+      if (userId.isEmpty) return;
+      final updatedTask = await _taskRepository.getTaskById(userId, taskId);
+      if (updatedTask == null) return;
+      setState(() {
+        final resultTaskIndex = _resultTasks.indexWhere((task) => task.id == taskId);
+        if (resultTaskIndex != -1) {
+          _resultTasks[resultTaskIndex] = updatedTask;
+        }
+      });
+    } catch (e) {
+      TopNotification.showError(context, 'Error updating task: $e');
+    }
+  }
+
+  Future<void> _deleteTaskById(String taskId) async {
+    try {
+      final userId = authProvider.currentUser?.id ?? '';
+      if (userId.isEmpty) return;
+      await _taskRepository.deleteTaskById(userId, taskId);
+      setState(() {
+        _resultTasks.removeWhere((task) => task.id == taskId);
+        _filteredTasksByStatus.removeWhere((task) => task.id == taskId);
+      });
+    } catch (e) {
+      TopNotification.showError(context, 'Error deleting task: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,33 +192,7 @@ class _MyWidgetState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 16),
                 _allTasks.isEmpty
-                    ? Container(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Image(image: AssetImage('assets/images/Checklist-rafiki_1.png')),
-                            Text(
-                              'What do you want to do today?',
-                              style: AppTextStyles.displaySmall.copyWith(
-                                color: AppColor.upToDoWhile,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              "Tap + to add your tasks",
-                              style: AppTextStyles.displaySmall.copyWith(
-                                color: AppColor.upToDoWhile,
-                                fontSize: 16,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            )
-                          ],
-                        ),
-                      )
+                    ? const EmptyTasksWidget()
                     : Column(
                         children: [
                           Container(
@@ -203,12 +210,12 @@ class _MyWidgetState extends State<HomeScreen> {
                                 Expanded(
                                   child: TextField(
                                     onChanged: _onSearchChanged,
-                                    style: const TextStyle(color: AppColor.upToDoWhile),
-                                    cursorColor: AppColor.upToDoWhile,
+                                    style: const TextStyle(color: AppColor.upToDoWhite),
+                                    cursorColor: AppColor.upToDoWhite,
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
-                                      hintText: 'Search for your task...',
-                                      hintStyle: TextStyle(color: AppColor.upToDoWhile),
+                                      hintText: 'Search your task...',
+                                      hintStyle: TextStyle(color: AppColor.upToDoWhite),
                                     ),
                                   ),
                                 ),
@@ -237,13 +244,19 @@ class _MyWidgetState extends State<HomeScreen> {
                             userId: authProvider.currentUser?.id ?? '',
                             categoryRepository: _categoryRepository,
                             onTaskCompleted: _setTaskCompleted,
+                            onTaskUpdated: (taskId) => _updateTaskById(taskId),
+                            onTaskDeleted: (taskId) => _deleteTaskById(taskId),
                             text: "No tasks yet,add some tasks or enjoy your day!",
                           ),
                           SizedBox(height: 16),
                           TaskFilterDropdown(
                               selectedValue: _selectedStatus,
                               onChanged: (value) => _onStatusChanged(value as TaskStatus?),
-                              type: Type.status),
+                              type: Type.status,
+                              items: [
+                                TaskStatus.completed,
+                                TaskStatus.uncompleted,
+                              ]),
                           SizedBox(height: 16),
                           TaskList(
                             tasks: _filteredTasksByStatus,

@@ -20,4 +20,12 @@ class TaskRepository {
   Future<bool> checkTaskNameExistsInCategory(String userId, String categoryId, String taskName) async {
     return await _taskService.checkTaskNameExistsInCategory(userId, categoryId, taskName);
   }
+
+  Future<void> deleteTaskById(String userId, String taskId) async {
+    await _taskService.deleteTaskById(userId, taskId);
+  }
+
+  Future<TaskDTO?> getTaskById(String userId, String taskId) async {
+    return await _taskService.getTaskById(userId, taskId);
+  }
 }

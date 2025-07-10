@@ -13,6 +13,7 @@ class TaskItem extends StatelessWidget {
   final VoidCallback onTap;
   final bool isCompleted;
   final VoidCallback? setTaskCompleted;
+  final bool isSelected;
 
   const TaskItem({
     super.key,
@@ -25,6 +26,7 @@ class TaskItem extends StatelessWidget {
     required this.onTap,
     required this.isCompleted,
     this.setTaskCompleted,
+    this.isSelected = false,
   });
 
   @override
@@ -35,6 +37,7 @@ class TaskItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColor.upToDoBgSecondary,
         borderRadius: BorderRadius.circular(12),
+        border: isSelected ? Border.all(color: AppColor.upToDoPrimary, width: 2) : null,
       ),
       child: Row(
         children: [
@@ -46,16 +49,16 @@ class TaskItem extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isCompleted ? AppColor.green : AppColor.upToDoWhile,
+                  color: isCompleted ? AppColor.green : AppColor.upToDoWhite,
                   width: 2,
                 ),
               ),
-              child: isCompleted ? Icon(Icons.check, color: AppColor.upToDoWhile, size: 16) : null,
+              child: isCompleted ? Icon(Icons.check, color: AppColor.upToDoWhite, size: 16) : null,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
-            child: GestureDetector(
+            child: InkWell(
               onTap: onTap,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -64,11 +67,11 @@ class TaskItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
-                        width: 150,
+                        width: 140,
                         child: Text(
                           name,
                           style: TextStyle(
-                            color: AppColor.upToDoWhile,
+                            color: AppColor.upToDoWhite,
                             fontSize: 16.5,
                             fontWeight: FontWeight.w600,
                           ),
@@ -80,7 +83,7 @@ class TaskItem extends StatelessWidget {
                       Text(
                         FormatTimeUtils.formatTaskTime(time),
                         style: TextStyle(
-                          color: AppColor.upToDoWhile,
+                          color: AppColor.upToDoWhite,
                           fontSize: 13.5,
                         ),
                       ),
@@ -115,7 +118,7 @@ class TaskItem extends StatelessWidget {
                                         height: 16,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: AppColor.upToDoWhile,
+                                          color: AppColor.upToDoWhite,
                                         ),
                                       );
                                     },
@@ -129,7 +132,7 @@ class TaskItem extends StatelessWidget {
                             Text(
                               categoryLabel,
                               style: const TextStyle(
-                                color: AppColor.upToDoWhile,
+                                color: AppColor.upToDoWhite,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -150,7 +153,7 @@ class TaskItem extends StatelessWidget {
                             const SizedBox(width: 4),
                             Text(
                               priorityLabel,
-                              style: TextStyle(color: AppColor.upToDoWhile),
+                              style: TextStyle(color: AppColor.upToDoWhite),
                             ),
                           ],
                         ),
