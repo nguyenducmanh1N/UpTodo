@@ -13,7 +13,8 @@ class TaskDTO with _$TaskDTO {
     required String categoryId,
     required String priority,
     bool? isCompleted,
-    @Default([]) List<TaskDTO> subtask,
+    List<TaskDTO>? subtask,
+    @Default(false) bool isSubtask,
   }) = _TaskDTO;
 
   factory TaskDTO.fromJson(Map<String, dynamic> json) => _$TaskDTOFromJson(json);

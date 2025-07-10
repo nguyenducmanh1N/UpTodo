@@ -12,7 +12,7 @@ enum SortStatus {
 }
 
 class TaskSortUtils {
-  Future<List<TaskDTO>> sortTasks(List<TaskDTO> tasks, TaskSortType sortType, SortStatus? sortStatus) async {
+  List<TaskDTO> sortTasks(List<TaskDTO> tasks, TaskSortType sortType, SortStatus? sortStatus) {
     switch (sortType) {
       case TaskSortType.priority:
         return sortTasksByPriority(tasks, sortStatus);
@@ -23,7 +23,7 @@ class TaskSortUtils {
     }
   }
 
-  Future<List<TaskDTO>> sortTasksByPriority(List<TaskDTO> tasks, SortStatus? sortStatus) async {
+  List<TaskDTO> sortTasksByPriority(List<TaskDTO> tasks, SortStatus? sortStatus) {
     final sortedTasks = List<TaskDTO>.from(tasks);
     try {
       sortedTasks.sort((a, b) {
@@ -38,7 +38,7 @@ class TaskSortUtils {
     }
   }
 
-  Future<List<TaskDTO>> sortTasksByDate(List<TaskDTO> tasks, SortStatus? sortStatus) async {
+  List<TaskDTO> sortTasksByDate(List<TaskDTO> tasks, SortStatus? sortStatus) {
     final sortedTasks = List<TaskDTO>.from(tasks);
     try {
       sortedTasks.sort((a, b) {
@@ -53,7 +53,7 @@ class TaskSortUtils {
     }
   }
 
-  Future<List<TaskDTO>> sortTasksByName(List<TaskDTO> tasks, SortStatus? sortStatus) async {
+  List<TaskDTO> sortTasksByName(List<TaskDTO> tasks, SortStatus? sortStatus) {
     final sortedTasks = List<TaskDTO>.from(tasks);
     try {
       sortedTasks.sort((a, b) {

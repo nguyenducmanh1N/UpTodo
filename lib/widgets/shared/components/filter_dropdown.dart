@@ -8,6 +8,7 @@ class TaskFilterDropdown extends StatelessWidget {
   final dynamic selectedValue;
   final ValueChanged<dynamic>? onChanged;
   final Type type;
+
   final List<dynamic>? items;
   final String? title;
 
@@ -19,15 +20,6 @@ class TaskFilterDropdown extends StatelessWidget {
     this.items,
     this.title,
   });
-
-  String get _placeholder {
-    switch (type) {
-      case Type.filter:
-        return 'All';
-      case Type.status:
-        return 'Completed';
-    }
-  }
 
   String _getLabel(dynamic item) {
     final String fullString = item.toString();
@@ -46,7 +38,7 @@ class TaskFilterDropdown extends StatelessWidget {
             value: item,
             child: Text(
               _getLabel(item).toString(),
-              style: AppTextStyles.displaySmall.copyWith(color: AppColor.upToDoWhile),
+              style: AppTextStyles.displaySmall.copyWith(color: AppColor.upToDoWhite),
             ),
           ),
         )
@@ -68,9 +60,9 @@ class TaskFilterDropdown extends StatelessWidget {
           items: _buildDropdownItems(),
           onChanged: onChanged,
           dropdownColor: AppColor.upToDoBgSecondary,
-          icon: const Icon(Icons.keyboard_arrow_down, color: AppColor.upToDoWhile),
-          style: AppTextStyles.displaySmall.copyWith(color: AppColor.upToDoWhile),
-          hint: Text(_placeholder, style: AppTextStyles.displaySmall.copyWith(color: Colors.white70)),
+          icon: Icon(Icons.keyboard_arrow_down, color: AppColor.upToDoWhite),
+          style: AppTextStyles.displaySmall.copyWith(color: AppColor.upToDoWhite),
+          hint: Text("", style: AppTextStyles.displaySmall.copyWith(color: AppColor.upToDoWhite)),
         ),
       ),
     );

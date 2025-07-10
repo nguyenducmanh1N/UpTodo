@@ -7,7 +7,7 @@ enum TaskFilter {
 }
 
 class TaskFilterUtils {
-  Future<List<TaskDTO>> filterTasks(List<TaskDTO> allTasks, TaskFilter? filterValue) async {
+  List<TaskDTO> filterTasks(List<TaskDTO> allTasks, TaskFilter? filterValue) {
     if (filterValue == null || filterValue == TaskFilter.all) {
       return allTasks;
     }
@@ -21,7 +21,7 @@ class TaskFilterUtils {
     }
   }
 
-  Future<List<TaskDTO>> _filterTodayTasks(List<TaskDTO> tasks) async {
+  List<TaskDTO> _filterTodayTasks(List<TaskDTO> tasks) {
     try {
       final today = DateTime.now();
       return tasks.where((task) {
@@ -33,7 +33,7 @@ class TaskFilterUtils {
     }
   }
 
-  Future<List<TaskDTO>> _filterTomorrowTasks(List<TaskDTO> tasks) async {
+  List<TaskDTO> _filterTomorrowTasks(List<TaskDTO> tasks) {
     try {
       final tomorrow = DateTime.now().add(const Duration(days: 1));
       return tasks.where((task) {

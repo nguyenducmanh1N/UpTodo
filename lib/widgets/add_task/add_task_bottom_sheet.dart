@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uptodo/models/task/task_dto.dart';
 import 'package:uptodo/providers/auth_provider.dart';
-import 'package:uptodo/repositories/task_repository.dart';
-import 'package:uptodo/services/task_service.dart';
+import 'package:uptodo/providers/task_provider.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/widgets/add_task/components/categories_dialog.dart';
 import 'package:uptodo/widgets/add_task/components/date_dialog.dart';
@@ -13,16 +12,15 @@ import 'package:uptodo/widgets/shared/components/notification.dart';
 import 'package:uuid/uuid.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
-  final VoidCallback? onTaskAdded;
   final List<TaskDTO> tasks;
-  const AddTaskBottomSheet({super.key, this.onTaskAdded, required this.tasks});
+  final DateTime? initialDate;
+  const AddTaskBottomSheet({super.key, required this.tasks, this.initialDate});
 
   @override
   State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
 }
 
 class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
-  final TaskRepository _taskRepository = TaskRepository(TaskService());
   late final AuthProvider authProvider;
   String _name = '';
   String _description = '';
@@ -34,6 +32,9 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   void initState() {
     super.initState();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (widget.initialDate != null) {
+      _selectedDate = widget.initialDate;
+    }
   }
 
   bool get _enableSaveButton {
@@ -77,10 +78,10 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     final userId = authProvider.currentUser?.id ?? '';
 
     try {
-      await _taskRepository.saveTask(userId, task);
+      final provider = Provider.of<TaskProvider>(context, listen: false);
+      await provider.addTask(userId, task);
       Navigator.pop(context);
       TopNotification.showSuccess(context, 'Task saved successfully');
-      widget.onTaskAdded?.call();
     } catch (error) {
       TopNotification.showError(context, 'Error saving task: $error');
     }
@@ -88,7 +89,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
   Color _setIconColor(dynamic value) {
     if (value == null) {
-      return AppColor.upToDoWhile;
+      return AppColor.upToDoWhite;
     }
     return AppColor.green;
   }
@@ -161,7 +162,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   child: SizedBox(
                     child: Image.asset(
                       'assets/images/send_icon.png',
-                      color: _enableSaveButton ? AppColor.upToDoPrimary : AppColor.upToDoWhile,
+                      color: _enableSaveButton ? AppColor.upToDoPrimary : AppColor.upToDoWhite,
                     ),
                   ),
                 ),

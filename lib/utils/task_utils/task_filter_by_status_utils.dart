@@ -6,7 +6,7 @@ enum TaskStatus {
 }
 
 class TaskStatusUtils {
-  Future<List<TaskDTO>> filterTasksByStatus(List<TaskDTO> tasks, TaskStatus status) {
+  List<TaskDTO> filterTasksByStatus(List<TaskDTO> tasks, TaskStatus status) {
     switch (status) {
       case TaskStatus.completed:
         return filterCompletedTask(tasks);
@@ -15,7 +15,7 @@ class TaskStatusUtils {
     }
   }
 
-  Future<List<TaskDTO>> filterCompletedTask(List<TaskDTO> tasks) async {
+  List<TaskDTO> filterCompletedTask(List<TaskDTO> tasks) {
     final tasksResult = List<TaskDTO>.from(tasks);
     try {
       return tasksResult.where((task) => task.isCompleted == true).toList();
@@ -24,7 +24,7 @@ class TaskStatusUtils {
     }
   }
 
-  Future<List<TaskDTO>> filterUncompletedTask(List<TaskDTO> tasks) async {
+  List<TaskDTO> filterUncompletedTask(List<TaskDTO> tasks) {
     final tasksResult = List<TaskDTO>.from(tasks);
     try {
       final now = DateTime.now();

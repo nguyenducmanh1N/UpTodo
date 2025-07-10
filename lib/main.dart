@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uptodo/providers/auth_provider.dart';
+import 'package:uptodo/providers/task_provider.dart';
+import 'package:uptodo/repositories/task_repository.dart';
+import 'package:uptodo/services/task_service.dart';
 import 'package:uptodo/widgets/home_screen.dart';
 import 'widgets/auth/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -8,12 +11,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => AuthProvider()..initializeAuth(),
-      child: const TodoApp(),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<AuthProvider>(
+        create: (_) => AuthProvider()..initializeAuth(),
+      ),
+      ChangeNotifierProvider<TaskProvider>(
+        create: (_) => TaskProvider(TaskRepository(TaskService())),
+      ),
+    ],
+    child: const TodoApp(),
+  ));
 }
 
 class TodoApp extends StatelessWidget {

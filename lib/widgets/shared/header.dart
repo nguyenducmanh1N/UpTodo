@@ -14,6 +14,17 @@ class Header extends StatefulWidget {
 }
 
 class _HeaderState extends State<Header> {
+  String _getSortStatusLabel(TaskSortType type, SortStatus status) {
+    switch (type) {
+      case TaskSortType.name:
+        return status == SortStatus.ascending ? 'A → Z' : 'Z → A';
+      case TaskSortType.date:
+        return status == SortStatus.ascending ? 'Oldest' : 'Newest';
+      case TaskSortType.priority:
+        return status == SortStatus.ascending ? 'Low → High' : 'High → Low';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -33,14 +44,14 @@ class _HeaderState extends State<Header> {
                     Text(
                       type.toString().split('.').last,
                       style: AppTextStyles.displaySmall.copyWith(
-                        color: Colors.white,
+                        color: AppColor.upToDoWhite,
                       ),
                     ),
                     PopupMenuButton<SortStatus>(
                       color: AppColor.upToDoBlack,
                       icon: const Icon(
                         Icons.arrow_right,
-                        color: Colors.white,
+                        color: AppColor.upToDoWhite,
                       ),
                       onSelected: (status) {
                         widget.onSortSelected!(type, status);
@@ -49,9 +60,9 @@ class _HeaderState extends State<Header> {
                         return PopupMenuItem<SortStatus>(
                           value: status,
                           child: Text(
-                            status.toString().split('.').last,
+                            _getSortStatusLabel(type, status),
                             style: AppTextStyles.displaySmall.copyWith(
-                              color: Colors.white,
+                              color: AppColor.upToDoWhite,
                             ),
                           ),
                         );
@@ -65,12 +76,12 @@ class _HeaderState extends State<Header> {
           Text(
             'UpToDo',
             style: AppTextStyles.displaySmall.copyWith(
-              color: Colors.white,
+              color: AppColor.upToDoWhite,
               fontWeight: FontWeight.bold,
             ),
           ),
           IconButton(
-            icon: Icon(Icons.logout, color: AppColor.upToDoWhile),
+            icon: Icon(Icons.logout, color: AppColor.upToDoWhite),
             onPressed: () {
               Provider.of<AuthProvider>(context, listen: false).logout();
             },
