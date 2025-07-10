@@ -5,7 +5,8 @@ import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DateDialog extends StatefulWidget {
-  const DateDialog({super.key});
+  final DateTime? initialDate;
+  const DateDialog({super.key, this.initialDate});
 
   @override
   State<DateDialog> createState() => _DateDialogState();
@@ -15,6 +16,15 @@ class _DateDialogState extends State<DateDialog> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   bool _isPickingTime = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialDate != null) {
+      _selectedDate = widget.initialDate!;
+      _selectedTime = TimeOfDay.fromDateTime(widget.initialDate!);
+    }
+  }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     setState(() {
@@ -104,7 +114,7 @@ class _DateDialogState extends State<DateDialog> {
   }
 
   Widget _buildTimePicker() {
-    TimeOfDay tempTime = TimeOfDay.now();
+    TimeOfDay tempTime = _selectedTime;
 
     return StatefulBuilder(
       builder: (context, setStateSB) {
@@ -124,6 +134,7 @@ class _DateDialogState extends State<DateDialog> {
                 mode: CupertinoDatePickerMode.time,
                 use24hFormat: true,
                 backgroundColor: AppColor.upToDoBgSecondary,
+                initialDateTime: DateTime(2024, 1, 1, _selectedTime.hour, _selectedTime.minute),
                 onDateTimeChanged: (DateTime newDateTime) {
                   setStateSB(() {
                     tempTime = TimeOfDay(
