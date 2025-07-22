@@ -5,7 +5,8 @@ import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DateDialog extends StatefulWidget {
-  const DateDialog({super.key});
+  final DateTime? initialDate;
+  const DateDialog({super.key, this.initialDate});
 
   @override
   State<DateDialog> createState() => _DateDialogState();
@@ -15,6 +16,15 @@ class _DateDialogState extends State<DateDialog> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   bool _isPickingTime = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialDate != null) {
+      _selectedDate = widget.initialDate!;
+      _selectedTime = TimeOfDay.fromDateTime(widget.initialDate!);
+    }
+  }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     setState(() {
@@ -59,10 +69,10 @@ class _DateDialogState extends State<DateDialog> {
             formatButtonVisible: false,
             titleCentered: true,
             titleTextStyle: AppTextStyles.displayMedium.copyWith(
-              color: AppColor.upToDoWhile,
+              color: AppColor.upToDoWhite,
             ),
-            leftChevronIcon: Icon(Icons.chevron_left, color: AppColor.upToDoWhile),
-            rightChevronIcon: Icon(Icons.chevron_right, color: AppColor.upToDoWhile),
+            leftChevronIcon: Icon(Icons.chevron_left, color: AppColor.upToDoWhite),
+            rightChevronIcon: Icon(Icons.chevron_right, color: AppColor.upToDoWhite),
           ),
         ),
         const SizedBox(height: 24),
@@ -93,7 +103,7 @@ class _DateDialogState extends State<DateDialog> {
               child: Text(
                 "Choose Time",
                 style: AppTextStyles.displaySmall.copyWith(
-                  color: AppColor.upToDoWhile,
+                  color: AppColor.upToDoWhite,
                 ),
               ),
             ),
@@ -104,7 +114,7 @@ class _DateDialogState extends State<DateDialog> {
   }
 
   Widget _buildTimePicker() {
-    TimeOfDay tempTime = TimeOfDay.now();
+    TimeOfDay tempTime = _selectedTime;
 
     return StatefulBuilder(
       builder: (context, setStateSB) {
@@ -114,7 +124,7 @@ class _DateDialogState extends State<DateDialog> {
             Text(
               "Choose Time",
               style: AppTextStyles.displayMedium.copyWith(
-                color: AppColor.upToDoWhile,
+                color: AppColor.upToDoWhite,
               ),
             ),
             const Divider(height: 24, color: AppColor.upToDoBgSecondary),
@@ -124,6 +134,7 @@ class _DateDialogState extends State<DateDialog> {
                 mode: CupertinoDatePickerMode.time,
                 use24hFormat: true,
                 backgroundColor: AppColor.upToDoBgSecondary,
+                initialDateTime: widget.initialDate ?? DateTime.now(),
                 onDateTimeChanged: (DateTime newDateTime) {
                   setStateSB(() {
                     tempTime = TimeOfDay(
@@ -160,7 +171,7 @@ class _DateDialogState extends State<DateDialog> {
                   child: Text(
                     "Save",
                     style: AppTextStyles.displaySmall.copyWith(
-                      color: AppColor.upToDoWhile,
+                      color: AppColor.upToDoWhite,
                     ),
                   ),
                 ),

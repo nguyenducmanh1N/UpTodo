@@ -6,6 +6,7 @@ class CustomTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final bool obscureText;
   final String? errorText;
+  final String? initialValue;
 
   const CustomTextField({
     super.key,
@@ -13,18 +14,20 @@ class CustomTextField extends StatelessWidget {
     required this.onChanged,
     this.obscureText = false,
     this.errorText,
+    this.initialValue,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      initialValue: initialValue,
       onChanged: onChanged,
       obscureText: obscureText,
-      style: TextStyle(color: AppColor.upToDoWhile),
+      style: TextStyle(color: AppColor.upToDoWhite),
       decoration: InputDecoration(
         hintText: hintText,
         errorText: errorText,
-        hintStyle: TextStyle(color: AppColor.upToDoWhile),
+        hintStyle: TextStyle(color: AppColor.upToDoWhite),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),

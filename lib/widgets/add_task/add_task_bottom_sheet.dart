@@ -2,26 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uptodo/models/task/task_dto.dart';
 import 'package:uptodo/providers/auth_provider.dart';
-import 'package:uptodo/repositories/task_repository.dart';
-import 'package:uptodo/services/task_service.dart';
+import 'package:uptodo/providers/task_provider.dart';
 import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/widgets/add_task/components/categories_dialog.dart';
 import 'package:uptodo/widgets/add_task/components/date_dialog.dart';
 import 'package:uptodo/widgets/add_task/components/priorities_dialog.dart';
 import 'package:uptodo/widgets/add_task/components/task_input_form_files.dart';
+import 'package:uptodo/widgets/shared/components/notification.dart';
 import 'package:uuid/uuid.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
-  final VoidCallback? onTaskAdded;
   final List<TaskDTO> tasks;
-  const AddTaskBottomSheet({super.key, this.onTaskAdded, required this.tasks});
+  final DateTime? initialDate;
+  const AddTaskBottomSheet({super.key, required this.tasks, this.initialDate});
 
   @override
   State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
 }
 
 class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
-  final TaskRepository _taskRepository = TaskRepository(TaskService());
   late final AuthProvider authProvider;
   String _name = '';
   String _description = '';
@@ -33,30 +32,13 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   void initState() {
     super.initState();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (widget.initialDate != null) {
+      _selectedDate = widget.initialDate;
+    }
   }
 
-  bool _validateFields() {
-    if (_selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select a date')),
-      );
-      return false;
-    }
-
-    if (_selectedCategoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select a category')),
-      );
-      return false;
-    }
-
-    if (_selectedPriority == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select a priority')),
-      );
-      return false;
-    }
-    return true;
+  bool get _enabledSaveButton {
+    return _name.trim().isNotEmpty && _selectedDate != null && _selectedCategoryId != null && _selectedPriority != null;
   }
 
   void _updateSelectedDate(DateTime date) {
@@ -78,7 +60,8 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   }
 
   void _handleSaveTask() async {
-    if (!_validateFields()) {
+    if (!_enabledSaveButton) {
+      TopNotification.showError(context, 'Please fill in all fields');
       return;
     }
 
@@ -95,17 +78,20 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     final userId = authProvider.currentUser?.id ?? '';
 
     try {
-      await _taskRepository.saveTask(userId, task);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Task saved successfully')),
-      );
+      final provider = Provider.of<TaskProvider>(context, listen: false);
+      await provider.addTask(userId, task);
+      TopNotification.showSuccess(context, 'Task saved successfully');
       Navigator.pop(context);
-      widget.onTaskAdded?.call();
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving task: $error')),
-      );
+      TopNotification.showError(context, 'Error saving task: $error');
     }
+  }
+
+  Color _getIconColor(dynamic value) {
+    if (value == null) {
+      return AppColor.upToDoWhite;
+    }
+    return AppColor.green;
   }
 
   @override
@@ -145,29 +131,39 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                     GestureDetector(
                       onTap: () => _showDateDialog(context),
                       child: SizedBox(
-                        child: Image.asset('assets/images/timer_icon.png', width: 34, height: 34),
+                        child: Image.asset(
+                          'assets/images/timer_icon.png',
+                          color: _getIconColor(_selectedDate),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 20),
                     GestureDetector(
                       onTap: () => _showCategoriesDialog(context),
                       child: SizedBox(
-                        child: Image.asset('assets/images/tag_icon.png', width: 34, height: 34),
-                      ),
+                          child: Image.asset(
+                        'assets/images/tag_icon.png',
+                        color: _getIconColor(_selectedCategoryId),
+                      )),
                     ),
                     const SizedBox(width: 20),
                     GestureDetector(
                       onTap: () => _showPrioritiesDialog(context),
                       child: SizedBox(
-                        child: Image.asset('assets/images/flag_icon.png', width: 34, height: 34),
-                      ),
+                          child: Image.asset(
+                        'assets/images/flag_icon.png',
+                        color: _getIconColor(_selectedPriority),
+                      )),
                     ),
                   ],
                 ),
                 GestureDetector(
                   onTap: _handleSaveTask,
                   child: SizedBox(
-                    child: Image.asset('assets/images/send_icon.png', width: 34, height: 34),
+                    child: Image.asset(
+                      'assets/images/send_icon.png',
+                      color: _enabledSaveButton ? AppColor.upToDoPrimary : AppColor.upToDoWhite,
+                    ),
                   ),
                 ),
               ],
@@ -182,7 +178,9 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   void _showDateDialog(BuildContext context) async {
     final dateResult = await showDialog<DateTime>(
       context: context,
-      builder: (context) => DateDialog(),
+      builder: (context) => DateDialog(
+        initialDate: _selectedDate,
+      ),
     );
     if (dateResult != null) {
       _updateSelectedDate(dateResult);
@@ -192,7 +190,9 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   void _showPrioritiesDialog(BuildContext context) async {
     final priorityResult = await showDialog<String>(
       context: context,
-      builder: (context) => PrioritiesDialog(),
+      builder: (context) => PrioritiesDialog(
+        initialPriority: _selectedPriority,
+      ),
     );
     if (priorityResult != null) {
       _updateSelectedPriority(priorityResult);
@@ -202,7 +202,9 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   void _showCategoriesDialog(BuildContext context) async {
     final categoryId = await showDialog<String>(
       context: context,
-      builder: (context) => CategoriesDialog(),
+      builder: (context) => CategoriesDialog(
+        initialCategoryId: _selectedCategoryId,
+      ),
     );
     if (categoryId != null) {
       _updateSelectedCategoryId(categoryId);

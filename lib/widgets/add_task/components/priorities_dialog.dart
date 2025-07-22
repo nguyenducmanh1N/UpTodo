@@ -3,10 +3,28 @@ import 'package:uptodo/styles/app_color.dart';
 import 'package:uptodo/styles/app_text_styles.dart';
 import 'package:uptodo/utils/priority_utils.dart';
 
-class PrioritiesDialog extends StatelessWidget {
-  const PrioritiesDialog({super.key});
+class PrioritiesDialog extends StatefulWidget {
+  String? initialPriority;
+  PrioritiesDialog({super.key, this.initialPriority});
+
+  @override
+  State<PrioritiesDialog> createState() => _PrioritiesDialogState();
+}
+
+class _PrioritiesDialogState extends State<PrioritiesDialog> {
+  String? _selectedPriority;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialPriority != null) {
+      _selectedPriority = widget.initialPriority;
+    }
+  }
 
   void _onPrioritySelected(String priorityKey, BuildContext context) {
+    setState(() {
+      _selectedPriority = priorityKey;
+    });
     Navigator.pop(context, priorityKey);
   }
 
@@ -46,11 +64,12 @@ class PrioritiesDialog extends StatelessWidget {
                   itemCount: PriorityUtils.priorities.length,
                   itemBuilder: (context, index) {
                     final priority = PriorityUtils.priorities[index];
+                    final isSelected = _selectedPriority == priority['key'];
                     return Container(
                       padding: const EdgeInsets.all(4.0),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
-                        color: AppColor.upToDoBgPrimary,
+                        color: isSelected ? AppColor.upToDoPrimary : AppColor.upToDoBgSecondary,
                       ),
                       child: GestureDetector(
                         onTap: () => _onPrioritySelected(
@@ -88,7 +107,7 @@ class PrioritiesDialog extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   onPressed: () {
@@ -98,23 +117,6 @@ class PrioritiesDialog extends StatelessWidget {
                     "Cancel",
                     style: AppTextStyles.displaySmall.copyWith(
                       color: AppColor.upToDoKeyPrimary,
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.upToDoPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    "Choose Time",
-                    style: AppTextStyles.displaySmall.copyWith(
-                      color: AppColor.upToDoWhile,
                     ),
                   ),
                 ),
